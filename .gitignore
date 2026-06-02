@@ -1,0 +1,12 @@
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# IDE 和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.log
+*.tmp

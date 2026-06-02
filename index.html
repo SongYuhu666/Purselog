@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purselog - 极简记账</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 主色调定义 */
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success-color: #22c55e;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部 */
+        header {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .app-logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+        }
+
+        .app-subtitle {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* 主内容区 */
+        main {
+            margin-top: 20px;
+        }
+
+        /* 添加记录按钮 */
+        .add-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        .add-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* 记录列表 */
+        .records-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .records-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .record-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .record-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .record-type {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .record-type.expense {
+            background: #fef2f2;
+        }
+
+        .record-type.income {
+            background: #f0fdf4;
+        }
+
+        .record-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .record-note {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .record-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .record-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .record-amount.expense {
+            color: #ef4444;
+        }
+
+        .record-amount.income {
+            color: #22c55e;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* 表单 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* 金额输入框容器 */
+        .amount-input-wrapper {
+            position: relative;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .amount-input {
+            padding-left: 36px;
+        }
+
+        /* 类型选择器 */
+        .type-selector {
+            display: flex;
+            gap: 12px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .type-btn:hover {
+            border-color: var(--primary-light);
+        }
+
+        .type-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: var(--light-bg);
+            color: var(--text-primary);
+        }
+
+        .btn-cancel:hover {
+            background: var(--border-color);
+        }
+
+        .btn-save {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-save:hover {
+            background: var(--primary-dark);
+        }
+
+        /* 成功提示 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--success-color);
+            color: var(--white);
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+
+            header {
+                padding: 30px 0;
+            }
+
+            .app-logo {
+                font-size: 1.75rem;
+            }
+
+            .add-btn {
+                padding: 14px 32px;
+                font-size: 1rem;
+            }
+
+            .modal {
+                max-width: 100%;
+            }
+
+            .modal-header,
+            .modal-body {
+                padding: 20px;
+            }
+
+            .record-item {
+                padding: 14px;
+            }
+
+            .record-amount {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <div class="app-logo">Purselog</div>
+            <div class="app-subtitle">极简记账 · 轻松记录</div>
+        </header>
+
+        <!-- 主内容 -->
+        <main>
+            <!-- 添加记录按钮 -->
+            <div class="add-btn-wrapper">
+                <button class="add-btn" id="addBtn">
+                    <span class="add-icon">+</span>
+                    记一笔
+                </button>
+            </div>
+
+            <!-- 记录列表 -->
+            <section class="records-section">
+                <h2 class="section-title">最近记录</h2>
+                <div class="records-list" id="recordsList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div>暂无记录，点击"记一笔"开始吧！</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">记一笔</h3>
+                <button class="close-btn" id="closeBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="recordForm">
+                    <!-- 类型选择 -->
+                    <div class="form-group">
+                        <label class="form-label">类型</label>
+                        <div class="type-selector">
+                            <button type="button" class="type-btn active" data-type="expense">
+                                <span>💸</span> 支出
+                            </button>
+                            <button type="button" class="type-btn" data-type="income">
+                                <span>💰</span> 收入
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 金额输入 -->
+                    <div class="form-group">
+                        <label class="form-label">金额</label>
+                        <div class="amount-input-wrapper">
+                            <span class="currency-symbol">¥</span>
+                            <input type="number" class="form-input amount-input" id="amountInput" 
+                                   placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <!-- 备注输入 -->
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <input type="text" class="form-input" id="noteInput" 
+                               placeholder="如：午餐、打车...">
+                    </div>
+
+                    <!-- 日期选择 -->
+                    <div class="form-group">
+                        <label class="form-label">日期</label>
+                        <input type="date" class="form-input" id="dateInput" required>
+                    </div>
+
+                    <!-- 按钮组 -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-cancel" id="cancelBtn">取消</button>
+                        <button type="submit" class="btn btn-save">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <span>保存成功！</span>
+    </div>
+
+    <script>
+        // DOM 元素
+        const addBtn = document.getElementById('addBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('closeBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const recordForm = document.getElementById('recordForm');
+        const amountInput = document.getElementById('amountInput');
+        const noteInput = document.getElementById('noteInput');
+        const dateInput = document.getElementById('dateInput');
+        const typeBtns = document.querySelectorAll('.type-btn');
+        const recordsList = document.getElementById('recordsList');
+        const toast = document.getElementById('toast');
+
+        // 记录数据存储
+        let records = [];
+
+        // 当前选中的类型
+        let selectedType = 'expense';
+
+        // 设置默认日期为今天
+        function setDefaultDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
+        }
+
+        // 显示模态框
+        function showModal() {
+            modalOverlay.classList.add('active');
+            amountInput.focus();
+        }
+
+        // 隐藏模态框
+        function hideModal() {
+            modalOverlay.classList.remove('active');
+            resetForm();
+        }
+
+        // 重置表单
+        function resetForm() {
+            recordForm.reset();
+            selectedType = 'expense';
+            typeBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === 'expense');
+            });
+            setDefaultDate();
+        }
+
+        // 显示提示信息
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // 类型选择
+        typeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedType = btn.dataset.type;
+            });
+        });
+
+        // 保存记录
+        recordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const amount = parseFloat(amountInput.value);
+            const note = noteInput.value || (selectedType === 'expense' ? '支出' : '收入');
+            const date = dateInput.value;
+
+            // 创建记录对象
+            const record = {
+                id: Date.now(),
+                type: selectedType,
+                amount: amount,
+                note: note,
+                date: date
+            };
+
+            // 添加到记录数组
+            records.unshift(record);
+
+            // 重新渲染记录列表
+            renderRecords();
+
+            // 显示成功提示
+            showToast();
+
+            // 隐藏模态框
+            hideModal();
+        });
+
+        // 渲染记录列表
+        function renderRecords() {
+            if (records.length === 0) {
+                recordsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div>暂无记录，点击"记一笔"开始吧！</div>
+                    </div>
+                `;
+                return;
+            }
+
+            recordsList.innerHTML = records.map(record => {
+                const typeIcon = record.type === 'expense' ? '💸' : '💰';
+                const amountPrefix = record.type === 'expense' ? '-' : '+';
+                const dateStr = formatDate(record.date);
+
+                return `
+                    <div class="record-item">
+                        <div class="record-left">
+                            <div class="record-type ${record.type}">
+                                ${typeIcon}
+                            </div>
+                            <div class="record-info">
+                                <div class="record-note">${record.note}</div>
+                                <div class="record-date">${dateStr}</div>
+                            </div>
+                        </div>
+                        <div class="record-amount ${record.type}">
+                            ${amountPrefix}¥${record.amount.toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 格式化日期
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${year}年${month}月${day}日`;
+        }
+
+        // 事件监听
+        addBtn.addEventListener('click', showModal);
+        closeBtn.addEventListener('click', hideModal);
+        cancelBtn.addEventListener('click', hideModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                hideModal();
+            }
+        });
+
+        // 初始化
+        setDefaultDate();
+        renderRecords();
+    </script>
+</body>
+</html>
