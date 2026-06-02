@@ -207,6 +207,29 @@
             color: #22c55e;
         }
 
+        .record-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
+            color: var(--white);
+        }
+
         /* 模态框 */
         .modal-overlay {
             position: fixed;
@@ -468,14 +491,14 @@
                 <div class="records-list" id="recordsList">
                     <div class="empty-state">
                         <div class="empty-state-icon">📝</div>
-                        <div>暂无记录，点击"记一笔"开始吧！</div>
+                        <div>暂无记账记录</div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- 模态框 -->
+    <!-- 记账模态框 -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
@@ -530,6 +553,24 @@
         </div>
     </div>
 
+    <!-- 删除确认模态框 -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">确认删除</h3>
+                <button class="close-btn" id="deleteCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 24px; color: var(--text-secondary);">确定要删除这条记录吗？此操作不可恢复。</p>
+                <!-- 按钮组 -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-cancel" id="deleteCancelBtn">取消</button>
+                    <button type="button" class="btn" style="background: #ef4444; color: white;" id="deleteConfirmBtn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 成功提示 -->
     <div class="toast" id="toast">
         <span>✓</span>
@@ -549,9 +590,16 @@
         const typeBtns = document.querySelectorAll('.type-btn');
         const recordsList = document.getElementById('recordsList');
         const toast = document.getElementById('toast');
+        
+        // 删除确认相关 DOM 元素
+        const deleteModalOverlay = document.getElementById('deleteModalOverlay');
+        const deleteCloseBtn = document.getElementById('deleteCloseBtn');
+        const deleteCancelBtn = document.getElementById('deleteCancelBtn');
+        const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
 
         // 记录数据存储
         let records = [];
+        let recordToDelete = null;
 
         // 当前选中的类型
         let selectedType = 'expense';
@@ -593,6 +641,25 @@
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 2000);
+        }
+
+        // 显示删除确认模态框
+        function showDeleteModal(recordId) {
+            recordToDelete = recordId;
+            deleteModalOverlay.classList.add('active');
+        }
+
+        // 隐藏删除确认模态框
+        function hideDeleteModal() {
+            deleteModalOverlay.classList.remove('active');
+            recordToDelete = null;
+        }
+
+        // 删除记录
+        function deleteRecord(recordId) {
+            records = records.filter(record => record.id !== recordId);
+            renderRecords();
+            hideDeleteModal();
         }
 
         // 类型选择
@@ -641,13 +708,16 @@
                 recordsList.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📝</div>
-                        <div>暂无记录，点击"记一笔"开始吧！</div>
+                        <div>暂无记账记录</div>
                     </div>
                 `;
                 return;
             }
 
-            recordsList.innerHTML = records.map(record => {
+            // 按日期倒序排列（最新的在最上面）
+            const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            recordsList.innerHTML = sortedRecords.map(record => {
                 const typeIcon = record.type === 'expense' ? '💸' : '💰';
                 const amountPrefix = record.type === 'expense' ? '-' : '+';
                 const dateStr = formatDate(record.date);
@@ -663,8 +733,11 @@
                                 <div class="record-date">${dateStr}</div>
                             </div>
                         </div>
-                        <div class="record-amount ${record.type}">
-                            ${amountPrefix}¥${record.amount.toFixed(2)}
+                        <div class="record-right">
+                            <div class="record-amount ${record.type}">
+                                ${amountPrefix}¥${record.amount.toFixed(2)}
+                            </div>
+                            <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
                         </div>
                     </div>
                 `;
@@ -687,6 +760,20 @@
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) {
                 hideModal();
+            }
+        });
+
+        // 删除确认模态框事件监听
+        deleteCloseBtn.addEventListener('click', hideDeleteModal);
+        deleteCancelBtn.addEventListener('click', hideDeleteModal);
+        deleteConfirmBtn.addEventListener('click', () => {
+            if (recordToDelete) {
+                deleteRecord(recordToDelete);
+            }
+        });
+        deleteModalOverlay.addEventListener('click', (e) => {
+            if (e.target === deleteModalOverlay) {
+                hideDeleteModal();
             }
         });
 
