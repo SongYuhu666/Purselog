@@ -115,11 +115,35 @@
             box-shadow: var(--shadow-sm);
         }
 
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
         .section-title {
             font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 20px;
             color: var(--text-primary);
+            margin: 0;
+        }
+
+        .clear-all-btn {
+            background: var(--light-bg);
+            color: var(--text-secondary);
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .clear-all-btn:hover {
+            background: #fee2e2;
+            color: #ef4444;
         }
 
         .records-list {
@@ -487,7 +511,10 @@
 
             <!-- 记录列表 -->
             <section class="records-section">
-                <h2 class="section-title">最近记录</h2>
+                <div class="section-header">
+                    <h2 class="section-title">最近记录</h2>
+                    <button class="clear-all-btn" id="clearAllBtn">清空所有数据</button>
+                </div>
                 <div class="records-list" id="recordsList">
                     <div class="empty-state">
                         <div class="empty-state-icon">📝</div>
@@ -571,6 +598,24 @@
         </div>
     </div>
 
+    <!-- 清空所有数据确认模态框 -->
+    <div class="modal-overlay" id="clearAllModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">清空所有数据</h3>
+                <button class="close-btn" id="clearAllCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 24px; color: var(--text-secondary);">确定要清空所有记账数据吗？此操作将永久删除所有记录，不可恢复！</p>
+                <!-- 按钮组 -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-cancel" id="clearAllCancelBtn">取消</button>
+                    <button type="button" class="btn" style="background: #ef4444; color: white;" id="clearAllConfirmBtn">清空</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 成功提示 -->
     <div class="toast" id="toast">
         <span>✓</span>
@@ -596,13 +641,63 @@
         const deleteCloseBtn = document.getElementById('deleteCloseBtn');
         const deleteCancelBtn = document.getElementById('deleteCancelBtn');
         const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+        
+        // 清空所有数据相关 DOM 元素
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const clearAllModalOverlay = document.getElementById('clearAllModalOverlay');
+        const clearAllCloseBtn = document.getElementById('clearAllCloseBtn');
+        const clearAllCancelBtn = document.getElementById('clearAllCancelBtn');
+        const clearAllConfirmBtn = document.getElementById('clearAllConfirmBtn');
 
         // 记录数据存储
         let records = [];
         let recordToDelete = null;
+        
+        // localStorage 存储键名
+        const STORAGE_KEY = 'purselog_records';
 
         // 当前选中的类型
         let selectedType = 'expense';
+
+        // 从 localStorage 读取数据
+        function loadRecordsFromStorage() {
+            try {
+                const storedData = localStorage.getItem(STORAGE_KEY);
+                if (storedData) {
+                    records = JSON.parse(storedData);
+                }
+            } catch (error) {
+                console.error('读取 localStorage 数据失败:', error);
+                records = [];
+            }
+        }
+
+        // 保存数据到 localStorage
+        function saveRecordsToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            } catch (error) {
+                console.error('保存到 localStorage 失败:', error);
+            }
+        }
+
+        // 显示清空所有数据确认模态框
+        function showClearAllModal() {
+            clearAllModalOverlay.classList.add('active');
+        }
+
+        // 隐藏清空所有数据确认模态框
+        function hideClearAllModal() {
+            clearAllModalOverlay.classList.remove('active');
+        }
+
+        // 清空所有数据
+        function clearAllRecords() {
+            records = [];
+            saveRecordsToStorage();
+            renderRecords();
+            hideClearAllModal();
+        }
 
         // 设置默认日期为今天
         function setDefaultDate() {
@@ -658,6 +753,7 @@
         // 删除记录
         function deleteRecord(recordId) {
             records = records.filter(record => record.id !== recordId);
+            saveRecordsToStorage();
             renderRecords();
             hideDeleteModal();
         }
@@ -691,6 +787,9 @@
 
             // 添加到记录数组
             records.unshift(record);
+            
+            // 保存到 localStorage
+            saveRecordsToStorage();
 
             // 重新渲染记录列表
             renderRecords();
@@ -776,8 +875,20 @@
                 hideDeleteModal();
             }
         });
+        
+        // 清空所有数据相关事件监听
+        clearAllBtn.addEventListener('click', showClearAllModal);
+        clearAllCloseBtn.addEventListener('click', hideClearAllModal);
+        clearAllCancelBtn.addEventListener('click', hideClearAllModal);
+        clearAllConfirmBtn.addEventListener('click', clearAllRecords);
+        clearAllModalOverlay.addEventListener('click', (e) => {
+            if (e.target === clearAllModalOverlay) {
+                hideClearAllModal();
+            }
+        });
 
         // 初始化
+        loadRecordsFromStorage();
         setDefaultDate();
         renderRecords();
     </script>
