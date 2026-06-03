@@ -70,6 +70,88 @@
             margin-top: 20px;
         }
 
+        /* 统计卡片区域 */
+        .stats-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        /* 时间周期切换器 */
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .period-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border-color);
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .period-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .period-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* 统计卡片网格 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        /* 单个统计卡片 */
+        .stat-card {
+            background: var(--light-bg);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-value.income {
+            color: #22c55e;
+        }
+
+        .stat-value.expense {
+            color: #ef4444;
+        }
+
+        .stat-value.positive {
+            color: #22c55e;
+        }
+
+        .stat-value.negative {
+            color: #ef4444;
+        }
+
         /* 添加记录按钮 */
         .add-btn-wrapper {
             display: flex;
@@ -488,6 +570,31 @@
             .record-amount {
                 font-size: 1.1rem;
             }
+
+            /* 移动端统计卡片优化 */
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .period-selector {
+                flex-wrap: wrap;
+            }
+
+            .period-btn {
+                flex: 1;
+                min-width: 80px;
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -501,6 +608,32 @@
 
         <!-- 主内容 -->
         <main>
+            <!-- 统计卡片区域 -->
+            <section class="stats-section">
+                <!-- 时间周期切换器 -->
+                <div class="period-selector">
+                    <button class="period-btn" data-period="lastMonth">上月</button>
+                    <button class="period-btn active" data-period="currentMonth">本月</button>
+                    <button class="period-btn" data-period="currentYear">本年</button>
+                </div>
+
+                <!-- 统计卡片网格 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">总收入</div>
+                        <div class="stat-value income" id="totalIncome">¥0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">总支出</div>
+                        <div class="stat-value expense" id="totalExpense">¥0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">结余</div>
+                        <div class="stat-value positive" id="totalBalance">¥0.00</div>
+                    </div>
+                </div>
+            </section>
+
             <!-- 添加记录按钮 -->
             <div class="add-btn-wrapper">
                 <button class="add-btn" id="addBtn">
@@ -649,10 +782,17 @@
         const clearAllCancelBtn = document.getElementById('clearAllCancelBtn');
         const clearAllConfirmBtn = document.getElementById('clearAllConfirmBtn');
 
+        // 统计相关 DOM 元素
+        const totalIncomeEl = document.getElementById('totalIncome');
+        const totalExpenseEl = document.getElementById('totalExpense');
+        const totalBalanceEl = document.getElementById('totalBalance');
+        const periodBtns = document.querySelectorAll('.period-btn');
+
         // 记录数据存储
         let records = [];
         let recordToDelete = null;
-        
+        let currentPeriod = 'currentMonth'; // 当前查看的周期
+
         // localStorage 存储键名
         const STORAGE_KEY = 'purselog_records';
 
@@ -696,8 +836,90 @@
             records = [];
             saveRecordsToStorage();
             renderRecords();
+            updateStats();
             hideClearAllModal();
         }
+
+        // 获取指定周期的时间范围
+        function getPeriodRange(period) {
+            const now = new Date();
+            let startDate, endDate;
+
+            switch (period) {
+                case 'lastMonth':
+                    // 上月
+                    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    startDate = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
+                    endDate = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
+                    break;
+                case 'currentMonth':
+                    // 本月
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    break;
+                case 'currentYear':
+                    // 本年
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date(now.getFullYear(), 11, 31);
+                    break;
+            }
+
+            return {
+                start: startDate.toISOString().split('T')[0],
+                end: endDate.toISOString().split('T')[0]
+            };
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const { start, end } = getPeriodRange(currentPeriod);
+
+            // 筛选指定周期内的记录
+            const filteredRecords = records.filter(record => {
+                return record.date >= start && record.date <= end;
+            });
+
+            // 计算总收入和总支出
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            filteredRecords.forEach(record => {
+                if (record.type === 'income') {
+                    totalIncome += record.amount;
+                } else if (record.type === 'expense') {
+                    totalExpense += record.amount;
+                }
+            });
+
+            // 计算结余
+            const balance = totalIncome - totalExpense;
+
+            // 更新显示
+            totalIncomeEl.textContent = `¥${totalIncome.toFixed(2)}`;
+            totalExpenseEl.textContent = `¥${totalExpense.toFixed(2)}`;
+            totalBalanceEl.textContent = `¥${balance.toFixed(2)}`;
+
+            // 根据结余正负设置颜色
+            if (balance >= 0) {
+                totalBalanceEl.className = 'stat-value positive';
+            } else {
+                totalBalanceEl.className = 'stat-value negative';
+            }
+        }
+
+        // 时间周期切换
+        periodBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有按钮的 active 类
+                periodBtns.forEach(b => b.classList.remove('active'));
+                // 添加当前按钮的 active 类
+                btn.classList.add('active');
+                // 更新当前周期
+                currentPeriod = btn.dataset.period;
+                // 更新统计数据
+                updateStats();
+            });
+        });
 
         // 设置默认日期为今天
         function setDefaultDate() {
@@ -793,6 +1015,9 @@
 
             // 重新渲染记录列表
             renderRecords();
+
+            // 更新统计数据
+            updateStats();
 
             // 显示成功提示
             showToast();
@@ -891,6 +1116,7 @@
         loadRecordsFromStorage();
         setDefaultDate();
         renderRecords();
+        updateStats();
     </script>
 </body>
 </html>
