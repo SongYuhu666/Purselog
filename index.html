@@ -895,19 +895,24 @@
             }
 
             .budget-set-btn {
-                background: var(--primary-color);
+                background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
                 color: var(--white);
                 border: none;
-                padding: 8px 16px;
-                border-radius: var(--radius-sm);
+                padding: 10px 20px;
+                border-radius: 12px;
                 cursor: pointer;
-                font-size: 0.9rem;
-                font-weight: 500;
-                transition: all 0.2s ease;
+                font-size: 0.95rem;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
             }
 
             .budget-set-btn:hover {
-                background: var(--primary-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             }
 
             /* 总预算概览 */
@@ -1218,7 +1223,10 @@
                         <div class="budget-card">
                             <div class="budget-card-header">
                                 <h3 class="budget-card-title">💼 本月预算</h3>
-                                <button class="budget-set-btn" id="budgetSetBtn">设置预算</button>
+                                <button class="budget-set-btn" id="budgetSetBtn">
+                                    <span>⚙️</span>
+                                    设置预算
+                                </button>
                             </div>
                             <div class="budget-overview">
                                 <div class="budget-overview-item">
