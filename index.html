@@ -981,12 +981,26 @@
 
             .budget-category-item.warning {
                 border-color: #f59e0b;
+                border-width: 2px;
                 background: #fffbeb;
+                box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
             }
 
             .budget-category-item.danger {
                 border-color: #ef4444;
+                border-width: 2px;
                 background: #fef2f2;
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+                animation: pulse-danger 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse-danger {
+                0%, 100% {
+                    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+                }
+                50% {
+                    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.3);
+                }
             }
 
             .budget-category-left {
@@ -1831,13 +1845,17 @@
                 budgetTotalProgressFill.style.width = `${percentage}%`;
                 budgetTotalProgressText.textContent = `已用 ${percentage.toFixed(1)}%`;
                 
-                // 设置进度条颜色
+                // 设置进度条颜色（使用内联样式确保显示正确）
+                let totalProgressColor = '#22c55e'; // 默认绿色
                 budgetTotalProgressFill.className = 'budget-progress-fill';
                 if (percentage >= 100) {
                     budgetTotalProgressFill.classList.add('danger');
+                    totalProgressColor = '#ef4444'; // 红色
                 } else if (percentage >= 80) {
                     budgetTotalProgressFill.classList.add('warning');
+                    totalProgressColor = '#f59e0b'; // 黄色
                 }
+                budgetTotalProgressFill.style.background = totalProgressColor;
             } else {
                 budgetTotalCard.style.display = 'none';
             }
@@ -1855,16 +1873,19 @@
                     let itemClass = 'budget-category-item';
                     let progressClass = 'budget-category-progress-fill';
                     let percentClass = 'budget-category-percent';
+                    let progressColor = category.color;
                     
                     if (budgetAmount > 0) {
                         if (percentage >= 100) {
                             itemClass += ' danger';
                             progressClass += ' danger';
                             percentClass += ' danger';
+                            progressColor = '#ef4444'; // 红色
                         } else if (percentage >= 80) {
                             itemClass += ' warning';
                             progressClass += ' warning';
                             percentClass += ' warning';
+                            progressColor = '#f59e0b'; // 黄色
                         }
                     }
 
@@ -1873,10 +1894,14 @@
                             <div class="budget-category-left">
                                 <span class="budget-category-icon">${category.icon}</span>
                                 <div class="budget-category-info">
-                                    <div class="budget-category-name" style="color: ${category.color};">${category.name}</div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div class="budget-category-name" style="color: ${category.color};">${category.name}</div>
+                                        ${budgetAmount > 0 && percentage >= 100 ? `<span style="font-size: 0.9rem;">⚠️</span>` : ''}
+                                        ${budgetAmount > 0 && percentage >= 80 && percentage < 100 ? `<span style="font-size: 0.9rem;">⚡</span>` : ''}
+                                    </div>
                                     ${budgetAmount > 0 ? `
                                         <div class="budget-category-progress">
-                                            <div class="${progressClass}" style="width: ${percentage}%; background: ${category.color};"></div>
+                                            <div class="${progressClass}" style="width: ${percentage}%; background: ${progressColor};"></div>
                                         </div>
                                     ` : ''}
                                 </div>
