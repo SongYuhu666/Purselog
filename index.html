@@ -540,6 +540,165 @@
             padding-left: 36px;
         }
 
+        /* 分类选择器 */
+        .category-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .category-btn:hover {
+            border-color: var(--primary-light);
+        }
+
+        .category-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .category-icon {
+            font-size: 1.1rem;
+        }
+
+        /* 分类列表 */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .category-item:hover {
+            border-color: var(--primary-light);
+        }
+
+        .category-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-item-icon {
+            font-size: 1.5rem;
+        }
+
+        .category-item-name {
+            font-weight: 500;
+        }
+
+        .category-item-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .category-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .category-action-btn.edit {
+            background: var(--light-bg);
+            color: var(--primary-color);
+        }
+
+        .category-action-btn.edit:hover {
+            background: var(--primary-light);
+            color: var(--white);
+        }
+
+        .category-action-btn.delete {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .category-action-btn.delete:hover {
+            background: #ef4444;
+            color: var(--white);
+        }
+
+        /* 图标选择器 */
+        .icon-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border-color);
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--primary-light);
+        }
+
+        .icon-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+        }
+
+        /* 颜色选择器 */
+        .color-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .color-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .color-btn.active {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
         /* 类型选择器 */
         .type-selector {
             display: flex;
@@ -726,6 +885,7 @@
                 <div class="tab-selector">
                     <button class="tab-btn active" data-tab="overview">概览</button>
                     <button class="tab-btn" data-tab="records">账单</button>
+                    <button class="tab-btn" data-tab="categories">分类管理</button>
                 </div>
 
                 <!-- 概览标签页内容 -->
@@ -806,6 +966,29 @@
                         </div>
                     </section>
                 </div>
+
+                <!-- 分类管理标签页内容 -->
+                <div class="tab-content" id="categoriesTab">
+                    <section class="records-section">
+                        <div class="section-header">
+                            <h2 class="section-title">支出分类</h2>
+                            <button class="clear-all-btn" onclick="showAddCategoryModal('expense')">+ 添加</button>
+                        </div>
+                        <div class="category-list" id="expenseCategoryList">
+                            <!-- 分类列表将由 JS 渲染 -->
+                        </div>
+                    </section>
+
+                    <section class="records-section" style="margin-top: 24px;">
+                        <div class="section-header">
+                            <h2 class="section-title">收入分类</h2>
+                            <button class="clear-all-btn" onclick="showAddCategoryModal('income')">+ 添加</button>
+                        </div>
+                        <div class="category-list" id="incomeCategoryList">
+                            <!-- 分类列表将由 JS 渲染 -->
+                        </div>
+                    </section>
+                </div>
             </div>
         </main>
     </div>
@@ -839,6 +1022,14 @@
                             <span class="currency-symbol">¥</span>
                             <input type="number" class="form-input amount-input" id="amountInput" 
                                    placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <!-- 分类选择 -->
+                    <div class="form-group">
+                        <label class="form-label">分类</label>
+                        <div class="category-selector" id="categorySelector">
+                            <!-- 分类按钮将由 JavaScript 动态生成 -->
                         </div>
                     </div>
 
@@ -901,6 +1092,69 @@
         </div>
     </div>
 
+    <!-- 分类添加/编辑模态框 -->
+    <div class="modal-overlay" id="categoryModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="categoryModalTitle">添加分类</h3>
+                <button class="close-btn" id="categoryCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryEditId">
+                    <input type="hidden" id="categoryEditType">
+                    
+                    <!-- 分类名称 -->
+                    <div class="form-group">
+                        <label class="form-label">分类名称</label>
+                        <input type="text" class="form-input" id="categoryNameInput" 
+                               placeholder="如：餐饮" maxlength="10" required>
+                    </div>
+
+                    <!-- 分类图标 -->
+                    <div class="form-group">
+                        <label class="form-label">选择图标</label>
+                        <div class="icon-selector" id="iconSelector">
+                            <!-- 图标选项将由 JS 动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 分类颜色 -->
+                    <div class="form-group">
+                        <label class="form-label">选择颜色</label>
+                        <div class="color-selector" id="colorSelector">
+                            <!-- 颜色选项将由 JS 动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 按钮组 -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-cancel" id="categoryCancelBtn">取消</button>
+                        <button type="submit" class="btn btn-save">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分类删除确认模态框 -->
+    <div class="modal-overlay" id="categoryDeleteModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">确认删除</h3>
+                <button class="close-btn" id="categoryDeleteCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 24px; color: var(--text-secondary);">确定要删除这个分类吗？此操作不可恢复。</p>
+                <!-- 按钮组 -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-cancel" id="categoryDeleteCancelBtn">取消</button>
+                    <button type="button" class="btn" style="background: #ef4444; color: white;" id="categoryDeleteConfirmBtn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 成功提示 -->
     <div class="toast" id="toast">
         <span>✓</span>
@@ -918,6 +1172,7 @@
         const noteInput = document.getElementById('noteInput');
         const dateInput = document.getElementById('dateInput');
         const typeBtns = document.querySelectorAll('.type-btn');
+        const categorySelector = document.getElementById('categorySelector');
         const recordsList = document.getElementById('recordsList');
         const toast = document.getElementById('toast');
         
@@ -950,6 +1205,26 @@
         const pieChartEmpty = document.getElementById('pieChartEmpty');
         const lineChartEmpty = document.getElementById('lineChartEmpty');
 
+        // 分类管理相关 DOM 元素
+        const categoryModalOverlay = document.getElementById('categoryModalOverlay');
+        const categoryCloseBtn = document.getElementById('categoryCloseBtn');
+        const categoryCancelBtn = document.getElementById('categoryCancelBtn');
+        const categoryForm = document.getElementById('categoryForm');
+        const categoryModalTitle = document.getElementById('categoryModalTitle');
+        const categoryEditId = document.getElementById('categoryEditId');
+        const categoryEditType = document.getElementById('categoryEditType');
+        const categoryNameInput = document.getElementById('categoryNameInput');
+        const iconSelector = document.getElementById('iconSelector');
+        const colorSelector = document.getElementById('colorSelector');
+        const expenseCategoryList = document.getElementById('expenseCategoryList');
+        const incomeCategoryList = document.getElementById('incomeCategoryList');
+
+        // 分类删除相关 DOM 元素
+        const categoryDeleteModalOverlay = document.getElementById('categoryDeleteModalOverlay');
+        const categoryDeleteCloseBtn = document.getElementById('categoryDeleteCloseBtn');
+        const categoryDeleteCancelBtn = document.getElementById('categoryDeleteCancelBtn');
+        const categoryDeleteConfirmBtn = document.getElementById('categoryDeleteConfirmBtn');
+
         // 图表实例
         let expensePieChart = null;
         let trendLineChart = null;
@@ -962,9 +1237,88 @@
 
         // localStorage 存储键名
         const STORAGE_KEY = 'purselog_records';
+        const CATEGORIES_KEY = 'purselog_categories';
 
         // 当前选中的类型
         let selectedType = 'expense';
+
+        // 当前选中的分类
+        let selectedCategory = null;
+
+        // 默认分类
+        const DEFAULT_CATEGORIES = {
+            income: [
+                { id: 'i1', name: '工资', icon: '💰', color: '#22c55e' },
+                { id: 'i2', name: '奖金', icon: '🎉', color: '#f59e0b' },
+                { id: 'i3', name: '投资', icon: '📈', color: '#3b82f6' },
+                { id: 'i4', name: '其他', icon: '💵', color: '#64748b' }
+            ],
+            expense: [
+                { id: 'e1', name: '餐饮', icon: '🍜', color: '#ef4444' },
+                { id: 'e2', name: '交通', icon: '🚗', color: '#f59e0b' },
+                { id: 'e3', name: '购物', icon: '🛒', color: '#8b5cf6' },
+                { id: 'e4', name: '娱乐', icon: '🎮', color: '#06b6d4' },
+                { id: 'e5', name: '医疗', icon: '🏥', color: '#ef4444' },
+                { id: 'e6', name: '教育', icon: '📚', color: '#3b82f6' },
+                { id: 'e7', name: '其他', icon: '💸', color: '#64748b' }
+            ]
+        };
+
+        // 分类数据
+        let categories = {
+            income: [],
+            expense: []
+        };
+
+        // 可选的图标列表
+        const ICONS = [
+            '💰', '💵', '💴', '💶', '💷', '🪙', '💳', '💎',
+            '🍜', '🍔', '🍕', '☕', '🍺', '🍷', '🧃', '🍎',
+            '🚗', '🚕', '🚙', '🚌', '🚕', '⛽', '🚇', '✈️',
+            '🛒', '🛍️', '👔', '👗', '👟', '💄', '🧴', '🪥',
+            '🎮', '🎬', '🎮', '🎯', '⚽', '🏀', '🎵', '🎤',
+            '🏥', '💊', '🩺', '🏨', '💉', '🦷', '👁️', '🧠',
+            '📚', '📖', '✏️', '🎓', '🖥️', '📱', '⌚', '🎒',
+            '🎁', '🎂', '🌸', '🌺', '❤️', '⭐', '🔥', '💡'
+        ];
+
+        // 可选的颜色列表
+        const COLORS = [
+            '#ef4444', '#f97316', '#f59e0b', '#eab308',
+            '#84cc16', '#22c55e', '#10b981', '#14b8a6',
+            '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+            '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
+            '#f43f5e', '#64748b', '#78716c', '#6b7280'
+        ];
+
+        // 当前选中的图标和颜色
+        let selectedIcon = ICONS[0];
+        let selectedColor = COLORS[0];
+
+        // 从 localStorage 读取分类数据
+        function loadCategoriesFromStorage() {
+            try {
+                const storedData = localStorage.getItem(CATEGORIES_KEY);
+                if (storedData) {
+                    categories = JSON.parse(storedData);
+                } else {
+                    // 没有分类数据时使用默认分类
+                    categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+                }
+            } catch (error) {
+                console.error('读取分类数据失败:', error);
+                categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+            }
+        }
+
+        // 保存分类数据到 localStorage
+        function saveCategoriesToStorage() {
+            try {
+                localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+            } catch (error) {
+                console.error('保存分类数据失败:', error);
+            }
+        }
 
         // 从 localStorage 读取数据
         function loadRecordsFromStorage() {
@@ -1104,26 +1458,22 @@
             pieChartCanvas.style.display = 'block';
             pieChartEmpty.style.display = 'none';
 
-            // 按备注分类统计
+            // 按分类统计
             const categoryMap = {};
             expenseRecords.forEach(record => {
-                const category = record.note || '其他';
-                if (!categoryMap[category]) {
-                    categoryMap[category] = 0;
+                const categoryId = record.categoryId;
+                const category = categories.expense.find(c => c.id === categoryId);
+                const categoryName = category ? category.name : '其他';
+                if (!categoryMap[categoryName]) {
+                    categoryMap[categoryName] = { amount: 0, color: category ? category.color : '#64748b' };
                 }
-                categoryMap[category] += record.amount;
+                categoryMap[categoryName].amount += record.amount;
             });
 
             // 生成图表数据
             const labels = Object.keys(categoryMap);
-            const data = Object.values(categoryMap);
-
-            // 生成随机颜色
-            const colors = [
-                '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe',
-                '#22c55e', '#16a34a', '#15803d', '#166534', '#22d3ee',
-                '#06b6d4', '#0891b2', '#0e7490', '#f59e0b', '#d97706'
-            ];
+            const data = labels.map(key => categoryMap[key].amount);
+            const colors = labels.map(key => categoryMap[key].color);
 
             // 如果图表已存在，销毁它
             if (expensePieChart) {
@@ -1295,6 +1645,204 @@
             });
         }
 
+        // 渲染图标选择器
+        function renderIconSelector() {
+            iconSelector.innerHTML = '';
+            ICONS.forEach((icon, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'icon-btn';
+                btn.dataset.icon = icon;
+                btn.textContent = icon;
+                
+                if (index === 0) {
+                    btn.classList.add('active');
+                }
+                
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedIcon = icon;
+                });
+                
+                iconSelector.appendChild(btn);
+            });
+        }
+
+        // 渲染颜色选择器
+        function renderColorSelector() {
+            colorSelector.innerHTML = '';
+            COLORS.forEach((color, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'color-btn';
+                btn.dataset.color = color;
+                btn.style.backgroundColor = color;
+                
+                if (index === 0) {
+                    btn.classList.add('active');
+                }
+                
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedColor = color;
+                });
+                
+                colorSelector.appendChild(btn);
+            });
+        }
+
+        // 渲染分类列表
+        function renderCategoryLists() {
+            // 渲染支出分类列表
+            expenseCategoryList.innerHTML = categories.expense.map(category => `
+                <div class="category-item">
+                    <div class="category-item-left">
+                        <span class="category-item-icon">${category.icon}</span>
+                        <span class="category-item-name" style="color: ${category.color};">${category.name}</span>
+                    </div>
+                    <div class="category-item-right">
+                        <button class="category-action-btn edit" onclick="showEditCategoryModal('expense', '${category.id}')">编辑</button>
+                        <button class="category-action-btn delete" onclick="showCategoryDeleteModal('expense', '${category.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // 渲染收入分类列表
+            incomeCategoryList.innerHTML = categories.income.map(category => `
+                <div class="category-item">
+                    <div class="category-item-left">
+                        <span class="category-item-icon">${category.icon}</span>
+                        <span class="category-item-name" style="color: ${category.color};">${category.name}</span>
+                    </div>
+                    <div class="category-item-right">
+                        <button class="category-action-btn edit" onclick="showEditCategoryModal('income', '${category.id}')">编辑</button>
+                        <button class="category-action-btn delete" onclick="showCategoryDeleteModal('income', '${category.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示添加分类模态框
+        function showAddCategoryModal(type) {
+            categoryModalTitle.textContent = '添加分类';
+            categoryEditId.value = '';
+            categoryEditType.value = type;
+            categoryNameInput.value = '';
+            
+            // 重置选择
+            selectedIcon = ICONS[0];
+            selectedColor = type === 'expense' ? COLORS[0] : COLORS[5];
+            renderIconSelector();
+            renderColorSelector();
+            
+            categoryModalOverlay.classList.add('active');
+            categoryNameInput.focus();
+        }
+
+        // 显示编辑分类模态框
+        function showEditCategoryModal(type, categoryId) {
+            const category = categories[type].find(c => c.id === categoryId);
+            if (!category) return;
+
+            categoryModalTitle.textContent = '编辑分类';
+            categoryEditId.value = categoryId;
+            categoryEditType.value = type;
+            categoryNameInput.value = category.name;
+            
+            // 设置选中的图标和颜色
+            selectedIcon = category.icon;
+            selectedColor = category.color;
+            renderIconSelector();
+            renderColorSelector();
+            
+            // 高亮选中的图标和颜色
+            setTimeout(() => {
+                const iconBtn = document.querySelector(`.icon-btn[data-icon="${category.icon}"]`);
+                const colorBtn = document.querySelector(`.color-btn[data-color="${category.color}"]`);
+                if (iconBtn) iconBtn.classList.add('active');
+                if (colorBtn) colorBtn.classList.add('active');
+            }, 0);
+            
+            categoryModalOverlay.classList.add('active');
+            categoryNameInput.focus();
+        }
+
+        // 隐藏分类模态框
+        function hideCategoryModal() {
+            categoryModalOverlay.classList.remove('active');
+        }
+
+        // 保存分类
+        function saveCategory(e) {
+            if (e) e.preventDefault();
+            
+            const name = categoryNameInput.value.trim();
+            if (!name) {
+                showToast('请输入分类名称');
+                return;
+            }
+
+            const type = categoryEditType.value;
+            const editId = categoryEditId.value;
+
+            if (editId) {
+                // 编辑现有分类
+                const category = categories[type].find(c => c.id === editId);
+                if (category) {
+                    category.name = name;
+                    category.icon = selectedIcon;
+                    category.color = selectedColor;
+                }
+            } else {
+                // 添加新分类
+                const newCategory = {
+                    id: `${type[0]}${Date.now()}`,
+                    name: name,
+                    icon: selectedIcon,
+                    color: selectedColor
+                };
+                categories[type].push(newCategory);
+            }
+
+            saveCategoriesToStorage();
+            renderCategoryLists();
+            renderCategorySelector();
+            updateExpensePieChart();
+            hideCategoryModal();
+            showToast();
+        }
+
+        // 要删除的分类信息
+        let categoryToDelete = null;
+
+        // 显示删除分类确认模态框
+        function showCategoryDeleteModal(type, categoryId) {
+            categoryToDelete = { type, categoryId };
+            categoryDeleteModalOverlay.classList.add('active');
+        }
+
+        // 隐藏删除分类模态框
+        function hideCategoryDeleteModal() {
+            categoryDeleteModalOverlay.classList.remove('active');
+            categoryToDelete = null;
+        }
+
+        // 删除分类
+        function deleteCategory() {
+            if (!categoryToDelete) return;
+
+            const { type, categoryId } = categoryToDelete;
+            categories[type] = categories[type].filter(c => c.id !== categoryId);
+
+            saveCategoriesToStorage();
+            renderCategoryLists();
+            renderCategorySelector();
+            updateExpensePieChart();
+            hideCategoryDeleteModal();
+        }
+
         // 标签页切换
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1350,6 +1898,7 @@
         // 显示模态框
         function showModal() {
             modalOverlay.classList.add('active');
+            renderCategorySelector();
             amountInput.focus();
         }
 
@@ -1397,12 +1946,43 @@
             hideDeleteModal();
         }
 
+        // 渲染分类选择器
+        function renderCategorySelector() {
+            categorySelector.innerHTML = '';
+            selectedCategory = null;
+            
+            const currentCategories = categories[selectedType];
+            
+            currentCategories.forEach((category, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'category-btn';
+                btn.dataset.categoryId = category.id;
+                
+                if (index === 0) {
+                    btn.classList.add('active');
+                    selectedCategory = category;
+                }
+                
+                btn.innerHTML = `<span class="category-icon">${category.icon}</span>${category.name}`;
+                
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedCategory = category;
+                });
+                
+                categorySelector.appendChild(btn);
+            });
+        }
+
         // 类型选择
         typeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 typeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 selectedType = btn.dataset.type;
+                renderCategorySelector();
             });
         });
 
@@ -1421,7 +2001,8 @@
                 type: selectedType,
                 amount: amount,
                 note: note,
-                date: date
+                date: date,
+                categoryId: selectedCategory ? selectedCategory.id : null
             };
 
             // 添加到记录数组
@@ -1462,18 +2043,36 @@
             const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             recordsList.innerHTML = sortedRecords.map(record => {
-                const typeIcon = record.type === 'expense' ? '💸' : '💰';
+                // 获取分类信息
+                let categoryInfo = { icon: record.type === 'expense' ? '💸' : '💰', name: '' };
+                if (record.categoryId) {
+                    const categoryList = categories[record.type] || [];
+                    const category = categoryList.find(c => c.id === record.categoryId);
+                    if (category) {
+                        categoryInfo = { icon: category.icon, name: category.name };
+                    }
+                }
+                
                 const amountPrefix = record.type === 'expense' ? '-' : '+';
                 const dateStr = formatDate(record.date);
+                
+                // 显示分类名称和备注
+                let displayText = categoryInfo.name;
+                if (record.note && record.note !== categoryInfo.name && record.note !== (record.type === 'expense' ? '支出' : '收入')) {
+                    displayText += ` · ${record.note}`;
+                }
+                if (!displayText) {
+                    displayText = record.note || (record.type === 'expense' ? '支出' : '收入');
+                }
 
                 return `
                     <div class="record-item">
                         <div class="record-left">
                             <div class="record-type ${record.type}">
-                                ${typeIcon}
+                                ${categoryInfo.icon}
                             </div>
                             <div class="record-info">
-                                <div class="record-note">${record.note}</div>
+                                <div class="record-note">${displayText}</div>
                                 <div class="record-date">${dateStr}</div>
                             </div>
                         </div>
@@ -1532,9 +2131,31 @@
             }
         });
 
+        // 分类模态框事件监听
+        categoryCloseBtn.addEventListener('click', hideCategoryModal);
+        categoryCancelBtn.addEventListener('click', hideCategoryModal);
+        categoryForm.addEventListener('submit', saveCategory);
+        categoryModalOverlay.addEventListener('click', (e) => {
+            if (e.target === categoryModalOverlay) {
+                hideCategoryModal();
+            }
+        });
+
+        // 分类删除模态框事件监听
+        categoryDeleteCloseBtn.addEventListener('click', hideCategoryDeleteModal);
+        categoryDeleteCancelBtn.addEventListener('click', hideCategoryDeleteModal);
+        categoryDeleteConfirmBtn.addEventListener('click', deleteCategory);
+        categoryDeleteModalOverlay.addEventListener('click', (e) => {
+            if (e.target === categoryDeleteModalOverlay) {
+                hideCategoryDeleteModal();
+            }
+        });
+
         // 初始化
+        loadCategoriesFromStorage();
         loadRecordsFromStorage();
         setDefaultDate();
+        renderCategoryLists();
         renderRecords();
         updateStats();
         updateCharts();
