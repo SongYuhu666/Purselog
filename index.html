@@ -1353,7 +1353,7 @@
                 <div class="tab-content" id="settingsTab">
                     <section class="records-section">
                         <div class="section-header">
-                            <h2 class="section-title">☁️ 云端同步</h2>
+                            <h2 class="section-title">☁️ 云端同步（GitHub Gist）</h2>
                         </div>
                         
                         <!-- 同步状态 -->
@@ -1362,29 +1362,22 @@
                             <div class="sync-status-text" id="syncStatusText">使用本地存储</div>
                         </div>
 
-                        <!-- WebDAV 配置 -->
+                        <!-- GitHub Gist 配置 -->
                         <div class="settings-form" style="margin-top: 24px;">
                             <div class="form-group">
-                                <label class="form-label">坚果云 WebDAV 地址</label>
-                                <input type="text" class="form-input" id="webdavUrl" 
-                                       placeholder="https://dav.jianguoyun.com/dav/Purselog/"
-                                       value="https://dav.jianguoyun.com/dav/Purselog/">
-                                <div class="input-hint">请在坚果云中创建 Purselog 文件夹</div>
+                                <label class="form-label">GitHub Personal Access Token</label>
+                                <input type="password" class="form-input" id="githubToken" 
+                                       placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                                <div class="input-hint">创建 Gist 时生成，用于访问你的 Gist 数据</div>
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label">坚果云账号</label>
-                                <input type="text" class="form-input" id="webdavUsername" 
-                                       placeholder="你的邮箱或手机号">
+                                <label class="form-label">Gist ID</label>
+                                <input type="text" class="form-input" id="gistId" 
+                                       placeholder="8d3c3e2a1b5c4d3e2f1a0b9c8d7e6f5a">
+                                <div class="input-hint">创建 Gist 后，URL 中的 ID（例如 github.com/gist/<strong>YOUR_GIST_ID</strong>）</div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">应用密码</label>
-                                <input type="password" class="form-input" id="webdavPassword" 
-                                       placeholder="在坚果云设置中生成的应用密码">
-                                <div class="input-hint">不是登录密码，需要在坚果云设置-安全选项中生成</div>
-                            </div>
-                            
+
                             <!-- 按钮组 -->
                             <div class="btn-group" style="margin-top: 20px;">
                                 <button type="button" class="btn btn-cancel" id="testConnectionBtn">
@@ -1405,14 +1398,32 @@
                         
                         <!-- 配置说明 -->
                         <div class="config-help" style="margin-top: 24px; padding: 16px; background: var(--bg-light); border-radius: var(--radius-sm);">
-                            <h3 style="margin-bottom: 12px; font-size: 1rem;">📖 如何配置</h3>
+                            <h3 style="margin-bottom: 12px; font-size: 1rem;">📖 如何配置 GitHub Gist 同步</h3>
                             <ol style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px;">
-                                <li>登录 <a href="https://www.jianguoyun.com" target="_blank" style="color: var(--primary-color);">坚果云官网</a></li>
-                                <li>在坚果云中创建一个名为 "Purselog" 的文件夹</li>
-                                <li>前往 账户设置 → 安全选项 → 第三方应用管理</li>
-                                <li>添加应用，获取应用密码</li>
-                                <li>填入上方表单，保存配置后即可使用</li>
+                                <li>登录 <a href="https://github.com" target="_blank" style="color: var(--primary-color);">GitHub</a>（如没有账号请先注册）</li>
+                                <li>前往 <a href="https://github.com/settings/tokens" target="_blank" style="color: var(--primary-color);">Personal Access Tokens 页面</a></li>
+                                <li>点击 "Generate new token (classic)"</li>
+                                <li>填写 Note: "Purselog Sync"，勾选 <strong>"gist"</strong> 权限</li>
+                                <li>点击 "Generate token"，复制生成的 Token</li>
+                                <li>在 GitHub 任意页面点击右上角 "+" → "New gist"</li>
+                                <li>Filename: <code>purselog.json</code>，内容随便填（如 <code>{"test": true}</code>）</li>
+                                <li>点击 "Create public gist" 或 "Create secret gist"</li>
+                                <li>复制 URL 中的 Gist ID（长串字符）</li>
+                                <li>填入上方表单，测试并保存配置</li>
                             </ol>
+                        </div>
+
+                        <!-- 数据安全提示 -->
+                        <div style="margin-top: 16px; padding: 12px; background: #fef3c7; border-radius: var(--radius-sm); border-left: 4px solid #f59e0b;">
+                            <div style="font-size: 0.9rem; color: #92400e;">
+                                <strong>⚠️ 重要提示：</strong>
+                                <ul style="margin: 8px 0 0 0; padding-left: 16px; line-height: 1.6;">
+                                    <li>请勿将 Token 分享给他人</li>
+                                    <li>建议使用单独的 Token 用于此应用</li>
+                                    <li>Secret Gist 不会被搜索引擎索引</li>
+                                    <li>数据以 JSON 格式存储在 Gist 中</li>
+                                </ul>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -1704,9 +1715,8 @@
         const budgetCategoryList = document.getElementById('budgetCategoryList');
 
         // 设置页面相关 DOM 元素
-        const webdavUrl = document.getElementById('webdavUrl');
-        const webdavUsername = document.getElementById('webdavUsername');
-        const webdavPassword = document.getElementById('webdavPassword');
+        const githubToken = document.getElementById('githubToken');
+        const gistId = document.getElementById('gistId');
         const testConnectionBtn = document.getElementById('testConnectionBtn');
         const saveConfigBtn = document.getElementById('saveConfigBtn');
         const syncNowBtn = document.getElementById('syncNowBtn');
@@ -1714,11 +1724,10 @@
         const syncStatusIcon = document.getElementById('syncStatusIcon');
         const syncStatusText = document.getElementById('syncStatusText');
 
-        // WebDAV 配置
-        let webdavConfig = {
-            url: '',
-            username: '',
-            password: ''
+        // GitHub Gist 配置
+        let gistConfig = {
+            token: '',
+            id: ''
         };
 
         // 是否使用云端存储
@@ -1815,7 +1824,7 @@
             try {
                 localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
                 if (useCloudStorage) {
-                    webdavPutFile('categories.json', categories);
+                    saveToGist();
                 }
             } catch (error) {
                 console.error('保存分类数据失败:', error);
@@ -1840,7 +1849,7 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
                 if (useCloudStorage) {
-                    webdavPutFile('records.json', records);
+                    saveToGist();
                 }
             } catch (error) {
                 console.error('保存到 localStorage 失败:', error);
@@ -1850,8 +1859,8 @@
         // 预算数据存储键名
         const BUDGETS_KEY = 'purselog_budgets';
 
-        // WebDAV 配置存储键名
-        const WEBDAV_CONFIG_KEY = 'purselog_webdav_config';
+        // GitHub Gist 配置存储键名
+        const GIST_CONFIG_KEY = 'purselog_gist_config';
 
         // 预算数据结构
         let budgets = {
@@ -1859,7 +1868,7 @@
             categories: {}  // 分类预算 {categoryId: amount}
         };
 
-        // === WebDAV 相关功能 ===
+        // === GitHub Gist 云端同步功能 ===
 
         // 更新同步状态显示
         function updateSyncStatus(icon, text, statusType = '') {
@@ -1868,34 +1877,32 @@
             syncStatusText.className = 'sync-status-text ' + statusType;
         }
 
-        // 加载 WebDAV 配置
-        function loadWebdavConfig() {
+        // 加载 GitHub Gist 配置
+        function loadGistConfig() {
             try {
-                const stored = localStorage.getItem(WEBDAV_CONFIG_KEY);
+                const stored = localStorage.getItem(GIST_CONFIG_KEY);
                 if (stored) {
-                    webdavConfig = JSON.parse(stored);
-                    webdavUrl.value = webdavConfig.url || '';
-                    webdavUsername.value = webdavConfig.username || '';
-                    webdavPassword.value = webdavConfig.password || '';
-                    useCloudStorage = webdavConfig.url && webdavConfig.username && webdavConfig.password;
+                    gistConfig = JSON.parse(stored);
+                    githubToken.value = gistConfig.token || '';
+                    gistId.value = gistConfig.id || '';
+                    useCloudStorage = gistConfig.token && gistConfig.id;
                     if (useCloudStorage) {
                         updateSyncStatus('☁️', '云端同步已启用', 'success');
                     }
                 }
             } catch (error) {
-                console.error('加载 WebDAV 配置失败:', error);
+                console.error('加载 Gist 配置失败:', error);
             }
         }
 
-        // 保存 WebDAV 配置
-        function saveWebdavConfig() {
-            webdavConfig = {
-                url: webdavUrl.value.trim(),
-                username: webdavUsername.value.trim(),
-                password: webdavPassword.value.trim()
+        // 保存 GitHub Gist 配置
+        function saveGistConfig() {
+            gistConfig = {
+                token: githubToken.value.trim(),
+                id: gistId.value.trim()
             };
-            localStorage.setItem(WEBDAV_CONFIG_KEY, JSON.stringify(webdavConfig));
-            useCloudStorage = webdavConfig.url && webdavConfig.username && webdavConfig.password;
+            localStorage.setItem(GIST_CONFIG_KEY, JSON.stringify(gistConfig));
+            useCloudStorage = gistConfig.token && gistConfig.id;
             if (useCloudStorage) {
                 updateSyncStatus('☁️', '配置已保存，正在连接...', 'syncing');
             } else {
@@ -1904,81 +1911,132 @@
             showToast();
         }
 
-        // WebDAV 文件下载
-        async function webdavGetFile(filename) {
+        // GitHub Gist API 请求
+        async function gistApi(endpoint, options = {}) {
             if (!useCloudStorage) return null;
             
-            const url = webdavConfig.url.replace(/\/$/, '') + '/' + filename;
-            const auth = 'Basic ' + btoa(webdavConfig.username + ':' + webdavConfig.password);
+            const url = `https://api.github.com/gists/${gistConfig.id}${endpoint}`;
+            const auth = 'Bearer ' + gistConfig.token;
+            
+            const defaultOptions = {
+                headers: {
+                    'Authorization': auth,
+                    'Accept': 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28',
+                    'Content-Type': 'application/json'
+                }
+            };
             
             try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': auth
-                    }
-                });
-                
+                const response = await fetch(url, { ...defaultOptions, ...options });
                 if (response.ok) {
-                    const text = await response.text();
-                    return JSON.parse(text);
+                    return await response.json();
                 } else if (response.status === 404) {
                     return null;
                 }
-                throw new Error('下载失败: ' + response.status);
+                throw new Error('API 请求失败: ' + response.status);
             } catch (error) {
-                console.error('WebDAV 下载失败:', error);
+                console.error('GitHub Gist API 请求失败:', error);
                 return null;
             }
         }
 
-        // WebDAV 文件上传
-        async function webdavPutFile(filename, data) {
-            if (!useCloudStorage) return false;
+        // 从 Gist 获取所有数据
+        async function loadFromGist() {
+            if (!useCloudStorage) return;
             
-            const url = webdavConfig.url.replace(/\/$/, '') + '/' + filename;
-            const auth = 'Basic ' + btoa(webdavConfig.username + ':' + webdavConfig.password);
+            updateSyncStatus('🔄', '正在从云端加载...', 'syncing');
             
             try {
-                const response = await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': auth,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+                const gist = await gistApi('');
+                if (!gist || !gist.files || !gist.files['purselog.json']) {
+                    // 如果文件不存在，创建它
+                    await saveToGist();
+                    updateSyncStatus('✅', '已创建云端数据文件', 'success');
+                    return;
+                }
                 
-                return response.ok;
+                const content = gist.files['purselog.json'].content;
+                const data = JSON.parse(content);
+                
+                // 恢复数据
+                if (data.records) records = data.records;
+                if (data.categories) categories = data.categories;
+                if (data.budgets) budgets = data.budgets;
+                
+                // 重新渲染所有数据
+                renderRecords();
+                renderCategoryLists();
+                renderCategorySelector();
+                updateStats();
+                updateCharts();
+                updateBudgets();
+                
+                updateSyncStatus('✅', '数据已从云端加载', 'success');
+                showToast('已同步最新数据');
             } catch (error) {
-                console.error('WebDAV 上传失败:', error);
-                return false;
+                console.error('加载云端数据失败:', error);
+                updateSyncStatus('❌', '加载失败', 'error');
             }
         }
 
-        // 测试 WebDAV 连接
-        async function testWebdavConnection() {
-            webdavConfig = {
-                url: webdavUrl.value.trim(),
-                username: webdavUsername.value.trim(),
-                password: webdavPassword.value.trim()
+        // 保存所有数据到 Gist
+        async function saveToGist() {
+            if (!useCloudStorage) return;
+            
+            updateSyncStatus('🔄', '正在保存到云端...', 'syncing');
+            
+            try {
+                const data = {
+                    records: records,
+                    categories: categories,
+                    budgets: budgets,
+                    lastUpdate: new Date().toISOString()
+                };
+                
+                const gist = await gistApi('', {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        files: {
+                            'purselog.json': {
+                                content: JSON.stringify(data, null, 2)
+                            }
+                        }
+                    })
+                });
+                
+                if (gist) {
+                    updateSyncStatus('✅', '数据已保存到云端', 'success');
+                } else {
+                    updateSyncStatus('❌', '保存失败', 'error');
+                }
+            } catch (error) {
+                console.error('保存云端数据失败:', error);
+                updateSyncStatus('❌', '保存失败', 'error');
+            }
+        }
+
+        // 测试 GitHub Gist 连接
+        async function testGistConnection() {
+            gistConfig = {
+                token: githubToken.value.trim(),
+                id: gistId.value.trim()
             };
             
-            if (!webdavConfig.url || !webdavConfig.username || !webdavConfig.password) {
+            if (!gistConfig.token || !gistConfig.id) {
                 updateSyncStatus('⚠️', '请完善配置信息', 'error');
                 return;
             }
             
             updateSyncStatus('🔄', '正在测试连接...', 'syncing');
             
-            const testData = { test: true, time: Date.now() };
-            const success = await webdavPutFile('test.json', testData);
+            const testGist = await gistApi('');
             
-            if (success) {
+            if (testGist) {
                 updateSyncStatus('✅', '连接测试成功！', 'success');
                 showToast('连接成功！');
             } else {
-                updateSyncStatus('❌', '连接失败，请检查配置', 'error');
+                updateSyncStatus('❌', '连接失败，请检查 Token 和 Gist ID', 'error');
                 showToast('连接失败！');
             }
         }
@@ -1986,44 +2044,13 @@
         // 同步所有数据到云端
         async function syncToCloud() {
             if (!useCloudStorage) return;
-            
-            updateSyncStatus('🔄', '正在同步数据...', 'syncing');
-            
-            const success1 = await webdavPutFile('records.json', records);
-            const success2 = await webdavPutFile('categories.json', categories);
-            const success3 = await webdavPutFile('budgets.json', budgets);
-            
-            if (success1 && success2 && success3) {
-                updateSyncStatus('✅', '数据已同步到云端', 'success');
-            } else {
-                updateSyncStatus('❌', '同步失败', 'error');
-            }
+            await saveToGist();
         }
 
         // 从云端加载所有数据
         async function loadFromCloud() {
             if (!useCloudStorage) return;
-            
-            updateSyncStatus('🔄', '正在从云端加载...', 'syncing');
-            
-            const cloudRecords = await webdavGetFile('records.json');
-            const cloudCategories = await webdavGetFile('categories.json');
-            const cloudBudgets = await webdavGetFile('budgets.json');
-            
-            if (cloudRecords) records = cloudRecords;
-            if (cloudCategories) categories = cloudCategories;
-            if (cloudBudgets) budgets = cloudBudgets;
-            
-            // 重新渲染所有数据
-            renderRecords();
-            renderCategoryLists();
-            renderCategorySelector();
-            updateStats();
-            updateCharts();
-            updateBudgets();
-            
-            updateSyncStatus('✅', '数据已从云端加载', 'success');
-            showToast('已同步最新数据');
+            await loadFromGist();
         }
 
         // 从 localStorage 读取预算数据
@@ -2044,7 +2071,7 @@
             try {
                 localStorage.setItem(BUDGETS_KEY, JSON.stringify(budgets));
                 if (useCloudStorage) {
-                    webdavPutFile('budgets.json', budgets);
+                    saveToGist();
                 }
             } catch (error) {
                 console.error('保存预算数据失败:', error);
@@ -3059,27 +3086,27 @@
 
         // 设置页面按钮事件监听
         saveConfigBtn.addEventListener('click', async () => {
-            saveWebdavConfig();
+            saveGistConfig();
             if (useCloudStorage) {
-                await loadFromCloud();
+                await loadFromGist();
             }
         });
         
-        testConnectionBtn.addEventListener('click', testWebdavConnection);
+        testConnectionBtn.addEventListener('click', testGistConnection);
         
         syncNowBtn.addEventListener('click', async () => {
-            await loadFromCloud();
+            await loadFromGist();
         });
 
         // 初始化
-        loadWebdavConfig();
+        loadGistConfig();
         loadCategoriesFromStorage();
         loadRecordsFromStorage();
         loadBudgetsFromStorage();
         
         // 如果配置了云端存储，尝试从云端加载数据
         if (useCloudStorage) {
-            loadFromCloud();
+            loadFromGist();
         }
         
         setDefaultDate();

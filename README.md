@@ -7,29 +7,30 @@
 ### [V1.7.0] - 2026-06-03
 
 #### 核心功能
-- ✅ 添加坚果云 WebDAV 云端同步功能
+- ✅ 添加 GitHub Gist 云端同步功能
 - ✅ 添加"设置"标签页，用于配置云端同步
-- ✅ 支持配置坚果云 WebDAV 地址、用户名和应用密码
-- ✅ 数据自动同步到云端（records.json, categories.json, budgets.json）
+- ✅ 支持配置 GitHub Personal Access Token 和 Gist ID
+- ✅ 数据自动同步到 GitHub Gist（purselog.json）
 - ✅ 页面加载时自动从云端拉取最新数据
-- ✅ 支持测试 WebDAV 连接
+- ✅ 支持测试 Gist 连接
 - ✅ 支持手动立即同步数据
 - ✅ 实时显示同步状态（同步中/成功/失败）
 - ✅ 保持本地 localStorage 作为备份，确保数据安全
 - ✅ 保持原有设计风格一致
 
 #### 技术实现
-- 添加 WebDAV API 调用函数（webdavGetFile, webdavPutFile）
-- 实现基础认证（Basic Auth）方式连接坚果云
+- 使用 GitHub Gist API 实现云端存储（支持 CORS）
+- 添加 GitHub API 调用函数（gistApi）
 - 数据同步逻辑：保存时同时更新本地和云端，加载时优先云端
 - 添加同步状态显示（图标和文本）
 - 新增设置页面 UI：配置表单、同步状态、使用说明
-- 数据格式：JSON 格式保存到坚果云
+- 数据格式：JSON 格式保存到 GitHub Gist
 - 支持本地存储和云端存储两种模式自动切换
 - 配置信息安全保存到 localStorage
+- GitHub Gist 支持 CORS，可直接从浏览器调用
 
 #### 文件变更
-- `index.html` - 添加云端同步功能
+- `index.html` - 添加云端同步功能（GitHub Gist）
 - `README.md` - 版本更新文档
 
 ---
