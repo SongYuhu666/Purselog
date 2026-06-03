@@ -1123,6 +1123,44 @@
                 font-weight: 500;
             }
 
+            /* 同步状态 */
+            .sync-status {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 16px;
+                background: var(--bg-light);
+                border-radius: var(--radius-md);
+            }
+
+            .sync-status-icon {
+                font-size: 2rem;
+            }
+
+            .sync-status-text {
+                font-size: 0.95rem;
+                color: var(--text-primary);
+            }
+
+            .sync-status-text.syncing {
+                color: var(--primary-color);
+            }
+
+            .sync-status-text.success {
+                color: #22c55e;
+            }
+
+            .sync-status-text.error {
+                color: #ef4444;
+            }
+
+            /* 输入提示 */
+            .input-hint {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                margin-top: 6px;
+            }
+
             /* 移动端预算样式优化 */
             @media (max-width: 480px) {
                 .budget-overview {
@@ -1159,10 +1197,11 @@
             <div class="tab-container">
                 <!-- 标签页切换器 -->
                 <div class="tab-selector">
-                    <button class="tab-btn active" data-tab="overview">概览</button>
-                    <button class="tab-btn" data-tab="records">账单</button>
-                    <button class="tab-btn" data-tab="categories">分类管理</button>
-                </div>
+                            <button class="tab-btn active" data-tab="overview">概览</button>
+                            <button class="tab-btn" data-tab="records">账单</button>
+                            <button class="tab-btn" data-tab="categories">分类管理</button>
+                            <button class="tab-btn" data-tab="settings">设置</button>
+                        </div>
 
                 <!-- 概览标签页内容 -->
                 <div class="tab-content active" id="overviewTab">
@@ -1306,6 +1345,74 @@
                         </div>
                         <div class="category-list" id="incomeCategoryList">
                             <!-- 分类列表将由 JS 渲染 -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 设置标签页内容 -->
+                <div class="tab-content" id="settingsTab">
+                    <section class="records-section">
+                        <div class="section-header">
+                            <h2 class="section-title">☁️ 云端同步</h2>
+                        </div>
+                        
+                        <!-- 同步状态 -->
+                        <div class="sync-status" id="syncStatus">
+                            <div class="sync-status-icon" id="syncStatusIcon">💾</div>
+                            <div class="sync-status-text" id="syncStatusText">使用本地存储</div>
+                        </div>
+
+                        <!-- WebDAV 配置 -->
+                        <div class="settings-form" style="margin-top: 24px;">
+                            <div class="form-group">
+                                <label class="form-label">坚果云 WebDAV 地址</label>
+                                <input type="text" class="form-input" id="webdavUrl" 
+                                       placeholder="https://dav.jianguoyun.com/dav/Purselog/"
+                                       value="https://dav.jianguoyun.com/dav/Purselog/">
+                                <div class="input-hint">请在坚果云中创建 Purselog 文件夹</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">坚果云账号</label>
+                                <input type="text" class="form-input" id="webdavUsername" 
+                                       placeholder="你的邮箱或手机号">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">应用密码</label>
+                                <input type="password" class="form-input" id="webdavPassword" 
+                                       placeholder="在坚果云设置中生成的应用密码">
+                                <div class="input-hint">不是登录密码，需要在坚果云设置-安全选项中生成</div>
+                            </div>
+                            
+                            <!-- 按钮组 -->
+                            <div class="btn-group" style="margin-top: 20px;">
+                                <button type="button" class="btn btn-cancel" id="testConnectionBtn">
+                                    🔗 测试连接
+                                </button>
+                                <button type="button" class="btn btn-save" id="saveConfigBtn">
+                                    💾 保存配置
+                                </button>
+                            </div>
+                            
+                            <div class="btn-group" style="margin-top: 12px;">
+                                <button type="button" class="btn" id="syncNowBtn" 
+                                        style="background: #22c55e; color: white;">
+                                    🔄 立即同步
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 配置说明 -->
+                        <div class="config-help" style="margin-top: 24px; padding: 16px; background: var(--bg-light); border-radius: var(--radius-sm);">
+                            <h3 style="margin-bottom: 12px; font-size: 1rem;">📖 如何配置</h3>
+                            <ol style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px;">
+                                <li>登录 <a href="https://www.jianguoyun.com" target="_blank" style="color: var(--primary-color);">坚果云官网</a></li>
+                                <li>在坚果云中创建一个名为 "Purselog" 的文件夹</li>
+                                <li>前往 账户设置 → 安全选项 → 第三方应用管理</li>
+                                <li>添加应用，获取应用密码</li>
+                                <li>填入上方表单，保存配置后即可使用</li>
+                            </ol>
                         </div>
                     </section>
                 </div>
@@ -1596,6 +1703,27 @@
         const budgetProgressFill = document.getElementById('budgetProgressFill');
         const budgetCategoryList = document.getElementById('budgetCategoryList');
 
+        // 设置页面相关 DOM 元素
+        const webdavUrl = document.getElementById('webdavUrl');
+        const webdavUsername = document.getElementById('webdavUsername');
+        const webdavPassword = document.getElementById('webdavPassword');
+        const testConnectionBtn = document.getElementById('testConnectionBtn');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const syncNowBtn = document.getElementById('syncNowBtn');
+        const syncStatus = document.getElementById('syncStatus');
+        const syncStatusIcon = document.getElementById('syncStatusIcon');
+        const syncStatusText = document.getElementById('syncStatusText');
+
+        // WebDAV 配置
+        let webdavConfig = {
+            url: '',
+            username: '',
+            password: ''
+        };
+
+        // 是否使用云端存储
+        let useCloudStorage = false;
+
         // 图表实例
         let expensePieChart = null;
         let trendLineChart = null;
@@ -1682,10 +1810,13 @@
             }
         }
 
-        // 保存分类数据到 localStorage
+        // 保存分类数据到 localStorage 并同步云端
         function saveCategoriesToStorage() {
             try {
                 localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+                if (useCloudStorage) {
+                    webdavPutFile('categories.json', categories);
+                }
             } catch (error) {
                 console.error('保存分类数据失败:', error);
             }
@@ -1704,10 +1835,13 @@
             }
         }
 
-        // 保存数据到 localStorage
+        // 保存数据到 localStorage 并同步云端
         function saveRecordsToStorage() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+                if (useCloudStorage) {
+                    webdavPutFile('records.json', records);
+                }
             } catch (error) {
                 console.error('保存到 localStorage 失败:', error);
             }
@@ -1716,11 +1850,181 @@
         // 预算数据存储键名
         const BUDGETS_KEY = 'purselog_budgets';
 
+        // WebDAV 配置存储键名
+        const WEBDAV_CONFIG_KEY = 'purselog_webdav_config';
+
         // 预算数据结构
         let budgets = {
             total: 0,  // 总预算
             categories: {}  // 分类预算 {categoryId: amount}
         };
+
+        // === WebDAV 相关功能 ===
+
+        // 更新同步状态显示
+        function updateSyncStatus(icon, text, statusType = '') {
+            syncStatusIcon.textContent = icon;
+            syncStatusText.textContent = text;
+            syncStatusText.className = 'sync-status-text ' + statusType;
+        }
+
+        // 加载 WebDAV 配置
+        function loadWebdavConfig() {
+            try {
+                const stored = localStorage.getItem(WEBDAV_CONFIG_KEY);
+                if (stored) {
+                    webdavConfig = JSON.parse(stored);
+                    webdavUrl.value = webdavConfig.url || '';
+                    webdavUsername.value = webdavConfig.username || '';
+                    webdavPassword.value = webdavConfig.password || '';
+                    useCloudStorage = webdavConfig.url && webdavConfig.username && webdavConfig.password;
+                    if (useCloudStorage) {
+                        updateSyncStatus('☁️', '云端同步已启用', 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('加载 WebDAV 配置失败:', error);
+            }
+        }
+
+        // 保存 WebDAV 配置
+        function saveWebdavConfig() {
+            webdavConfig = {
+                url: webdavUrl.value.trim(),
+                username: webdavUsername.value.trim(),
+                password: webdavPassword.value.trim()
+            };
+            localStorage.setItem(WEBDAV_CONFIG_KEY, JSON.stringify(webdavConfig));
+            useCloudStorage = webdavConfig.url && webdavConfig.username && webdavConfig.password;
+            if (useCloudStorage) {
+                updateSyncStatus('☁️', '配置已保存，正在连接...', 'syncing');
+            } else {
+                updateSyncStatus('💾', '使用本地存储', '');
+            }
+            showToast();
+        }
+
+        // WebDAV 文件下载
+        async function webdavGetFile(filename) {
+            if (!useCloudStorage) return null;
+            
+            const url = webdavConfig.url.replace(/\/$/, '') + '/' + filename;
+            const auth = 'Basic ' + btoa(webdavConfig.username + ':' + webdavConfig.password);
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': auth
+                    }
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    return JSON.parse(text);
+                } else if (response.status === 404) {
+                    return null;
+                }
+                throw new Error('下载失败: ' + response.status);
+            } catch (error) {
+                console.error('WebDAV 下载失败:', error);
+                return null;
+            }
+        }
+
+        // WebDAV 文件上传
+        async function webdavPutFile(filename, data) {
+            if (!useCloudStorage) return false;
+            
+            const url = webdavConfig.url.replace(/\/$/, '') + '/' + filename;
+            const auth = 'Basic ' + btoa(webdavConfig.username + ':' + webdavConfig.password);
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': auth,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.error('WebDAV 上传失败:', error);
+                return false;
+            }
+        }
+
+        // 测试 WebDAV 连接
+        async function testWebdavConnection() {
+            webdavConfig = {
+                url: webdavUrl.value.trim(),
+                username: webdavUsername.value.trim(),
+                password: webdavPassword.value.trim()
+            };
+            
+            if (!webdavConfig.url || !webdavConfig.username || !webdavConfig.password) {
+                updateSyncStatus('⚠️', '请完善配置信息', 'error');
+                return;
+            }
+            
+            updateSyncStatus('🔄', '正在测试连接...', 'syncing');
+            
+            const testData = { test: true, time: Date.now() };
+            const success = await webdavPutFile('test.json', testData);
+            
+            if (success) {
+                updateSyncStatus('✅', '连接测试成功！', 'success');
+                showToast('连接成功！');
+            } else {
+                updateSyncStatus('❌', '连接失败，请检查配置', 'error');
+                showToast('连接失败！');
+            }
+        }
+
+        // 同步所有数据到云端
+        async function syncToCloud() {
+            if (!useCloudStorage) return;
+            
+            updateSyncStatus('🔄', '正在同步数据...', 'syncing');
+            
+            const success1 = await webdavPutFile('records.json', records);
+            const success2 = await webdavPutFile('categories.json', categories);
+            const success3 = await webdavPutFile('budgets.json', budgets);
+            
+            if (success1 && success2 && success3) {
+                updateSyncStatus('✅', '数据已同步到云端', 'success');
+            } else {
+                updateSyncStatus('❌', '同步失败', 'error');
+            }
+        }
+
+        // 从云端加载所有数据
+        async function loadFromCloud() {
+            if (!useCloudStorage) return;
+            
+            updateSyncStatus('🔄', '正在从云端加载...', 'syncing');
+            
+            const cloudRecords = await webdavGetFile('records.json');
+            const cloudCategories = await webdavGetFile('categories.json');
+            const cloudBudgets = await webdavGetFile('budgets.json');
+            
+            if (cloudRecords) records = cloudRecords;
+            if (cloudCategories) categories = cloudCategories;
+            if (cloudBudgets) budgets = cloudBudgets;
+            
+            // 重新渲染所有数据
+            renderRecords();
+            renderCategoryLists();
+            renderCategorySelector();
+            updateStats();
+            updateCharts();
+            updateBudgets();
+            
+            updateSyncStatus('✅', '数据已从云端加载', 'success');
+            showToast('已同步最新数据');
+        }
 
         // 从 localStorage 读取预算数据
         function loadBudgetsFromStorage() {
@@ -1735,10 +2039,13 @@
             }
         }
 
-        // 保存预算数据到 localStorage
+        // 保存预算数据到 localStorage 并同步云端
         function saveBudgetsToStorage() {
             try {
                 localStorage.setItem(BUDGETS_KEY, JSON.stringify(budgets));
+                if (useCloudStorage) {
+                    webdavPutFile('budgets.json', budgets);
+                }
             } catch (error) {
                 console.error('保存预算数据失败:', error);
             }
@@ -2750,10 +3057,31 @@
             }
         });
 
+        // 设置页面按钮事件监听
+        saveConfigBtn.addEventListener('click', async () => {
+            saveWebdavConfig();
+            if (useCloudStorage) {
+                await loadFromCloud();
+            }
+        });
+        
+        testConnectionBtn.addEventListener('click', testWebdavConnection);
+        
+        syncNowBtn.addEventListener('click', async () => {
+            await loadFromCloud();
+        });
+
         // 初始化
+        loadWebdavConfig();
         loadCategoriesFromStorage();
         loadRecordsFromStorage();
         loadBudgetsFromStorage();
+        
+        // 如果配置了云端存储，尝试从云端加载数据
+        if (useCloudStorage) {
+            loadFromCloud();
+        }
+        
         setDefaultDate();
         renderCategoryLists();
         renderRecords();
