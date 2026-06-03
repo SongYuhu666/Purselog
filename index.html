@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Purselog - 极简记账</title>
+    <!-- 引入 Chart.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         /* 全局样式重置 */
         * {
@@ -68,6 +70,68 @@
         /* 主内容区 */
         main {
             margin-top: 20px;
+        }
+
+        /* 标签页容器 */
+        .tab-container {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        /* 标签页切换器 */
+        .tab-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: 2px solid var(--border-color);
+            background: var(--white);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* 标签页内容区域 */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 统计卡片区域 */
@@ -150,6 +214,39 @@
 
         .stat-value.negative {
             color: #ef4444;
+        }
+
+        /* 图表区域 */
+        .chart-section {
+            margin-top: 24px;
+        }
+
+        .chart-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* 图表空状态 */
+        .chart-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
         }
 
         /* 添加记录按钮 */
@@ -595,6 +692,21 @@
                 padding: 6px 12px;
                 font-size: 0.85rem;
             }
+
+            /* 移动端标签页优化 */
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            /* 移动端图表优化 */
+            .chart-container {
+                height: 250px;
+            }
+
+            .chart-card {
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -608,53 +720,93 @@
 
         <!-- 主内容 -->
         <main>
-            <!-- 统计卡片区域 -->
-            <section class="stats-section">
-                <!-- 时间周期切换器 -->
-                <div class="period-selector">
-                    <button class="period-btn" data-period="lastMonth">上月</button>
-                    <button class="period-btn active" data-period="currentMonth">本月</button>
-                    <button class="period-btn" data-period="currentYear">本年</button>
+            <!-- 标签页容器 -->
+            <div class="tab-container">
+                <!-- 标签页切换器 -->
+                <div class="tab-selector">
+                    <button class="tab-btn active" data-tab="overview">概览</button>
+                    <button class="tab-btn" data-tab="records">账单</button>
                 </div>
 
-                <!-- 统计卡片网格 -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">总收入</div>
-                        <div class="stat-value income" id="totalIncome">¥0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">总支出</div>
-                        <div class="stat-value expense" id="totalExpense">¥0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">结余</div>
-                        <div class="stat-value positive" id="totalBalance">¥0.00</div>
+                <!-- 概览标签页内容 -->
+                <div class="tab-content active" id="overviewTab">
+                    <!-- 统计卡片区域 -->
+                    <section class="stats-section">
+                        <!-- 时间周期切换器 -->
+                        <div class="period-selector">
+                            <button class="period-btn" data-period="lastMonth">上月</button>
+                            <button class="period-btn active" data-period="currentMonth">本月</button>
+                            <button class="period-btn" data-period="currentYear">本年</button>
+                        </div>
+
+                        <!-- 统计卡片网格 -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">总收入</div>
+                                <div class="stat-value income" id="totalIncome">¥0.00</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">总支出</div>
+                                <div class="stat-value expense" id="totalExpense">¥0.00</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">结余</div>
+                                <div class="stat-value positive" id="totalBalance">¥0.00</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 图表区域 -->
+                    <div class="chart-section">
+                        <!-- 饼图：本月支出分类占比 -->
+                        <div class="chart-card">
+                            <h3 class="chart-title">💰 本月支出分类占比</h3>
+                            <div class="chart-container">
+                                <canvas id="expensePieChart"></canvas>
+                            </div>
+                            <div class="chart-empty" id="pieChartEmpty">
+                                <div>暂无支出数据</div>
+                            </div>
+                        </div>
+
+                        <!-- 折线图：近7天收支趋势 -->
+                        <div class="chart-card">
+                            <h3 class="chart-title">📈 近7天收支趋势</h3>
+                            <div class="chart-container">
+                                <canvas id="trendLineChart"></canvas>
+                            </div>
+                            <div class="chart-empty" id="lineChartEmpty">
+                                <div>暂无数据</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- 添加记录按钮 -->
-            <div class="add-btn-wrapper">
-                <button class="add-btn" id="addBtn">
-                    <span class="add-icon">+</span>
-                    记一笔
-                </button>
+                <!-- 账单标签页内容 -->
+                <div class="tab-content" id="recordsTab">
+                    <!-- 添加记录按钮 -->
+                    <div class="add-btn-wrapper">
+                        <button class="add-btn" id="addBtn">
+                            <span class="add-icon">+</span>
+                            记一笔
+                        </button>
+                    </div>
+
+                    <!-- 记录列表 -->
+                    <section class="records-section">
+                        <div class="section-header">
+                            <h2 class="section-title">最近记录</h2>
+                            <button class="clear-all-btn" id="clearAllBtn">清空所有数据</button>
+                        </div>
+                        <div class="records-list" id="recordsList">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📝</div>
+                                <div>暂无记账记录</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
             </div>
-
-            <!-- 记录列表 -->
-            <section class="records-section">
-                <div class="section-header">
-                    <h2 class="section-title">最近记录</h2>
-                    <button class="clear-all-btn" id="clearAllBtn">清空所有数据</button>
-                </div>
-                <div class="records-list" id="recordsList">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📝</div>
-                        <div>暂无记账记录</div>
-                    </div>
-                </div>
-            </section>
         </main>
     </div>
 
@@ -788,10 +940,25 @@
         const totalBalanceEl = document.getElementById('totalBalance');
         const periodBtns = document.querySelectorAll('.period-btn');
 
+        // 标签页相关 DOM 元素
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // 图表相关 DOM 元素
+        const pieChartCanvas = document.getElementById('expensePieChart');
+        const lineChartCanvas = document.getElementById('trendLineChart');
+        const pieChartEmpty = document.getElementById('pieChartEmpty');
+        const lineChartEmpty = document.getElementById('lineChartEmpty');
+
+        // 图表实例
+        let expensePieChart = null;
+        let trendLineChart = null;
+
         // 记录数据存储
         let records = [];
         let recordToDelete = null;
         let currentPeriod = 'currentMonth'; // 当前查看的周期
+        let currentTab = 'overview'; // 当前标签页
 
         // localStorage 存储键名
         const STORAGE_KEY = 'purselog_records';
@@ -837,6 +1004,7 @@
             saveRecordsToStorage();
             renderRecords();
             updateStats();
+            updateCharts();
             hideClearAllModal();
         }
 
@@ -907,6 +1075,253 @@
             }
         }
 
+        // 更新所有图表
+        function updateCharts() {
+            updateExpensePieChart();
+            updateTrendLineChart();
+        }
+
+        // 更新支出饼图
+        function updateExpensePieChart() {
+            // 获取本月的支出记录
+            const { start, end } = getPeriodRange('currentMonth');
+            const expenseRecords = records.filter(record => {
+                return record.type === 'expense' && record.date >= start && record.date <= end;
+            });
+
+            // 如果没有支出记录，显示空状态
+            if (expenseRecords.length === 0) {
+                pieChartCanvas.style.display = 'none';
+                pieChartEmpty.style.display = 'block';
+                if (expensePieChart) {
+                    expensePieChart.destroy();
+                    expensePieChart = null;
+                }
+                return;
+            }
+
+            // 隐藏空状态
+            pieChartCanvas.style.display = 'block';
+            pieChartEmpty.style.display = 'none';
+
+            // 按备注分类统计
+            const categoryMap = {};
+            expenseRecords.forEach(record => {
+                const category = record.note || '其他';
+                if (!categoryMap[category]) {
+                    categoryMap[category] = 0;
+                }
+                categoryMap[category] += record.amount;
+            });
+
+            // 生成图表数据
+            const labels = Object.keys(categoryMap);
+            const data = Object.values(categoryMap);
+
+            // 生成随机颜色
+            const colors = [
+                '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe',
+                '#22c55e', '#16a34a', '#15803d', '#166534', '#22d3ee',
+                '#06b6d4', '#0891b2', '#0e7490', '#f59e0b', '#d97706'
+            ];
+
+            // 如果图表已存在，销毁它
+            if (expensePieChart) {
+                expensePieChart.destroy();
+            }
+
+            // 创建饼图
+            const ctx = pieChartCanvas.getContext('2d');
+            expensePieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ¥${value.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新趋势折线图
+        function updateTrendLineChart() {
+            // 获取近7天的数据
+            const today = new Date();
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 6);
+
+            // 生成近7天的日期标签
+            const labels = [];
+            const incomeData = [];
+            const expenseData = [];
+
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(sevenDaysAgo);
+                date.setDate(sevenDaysAgo.getDate() + i);
+                const dateStr = date.toISOString().split('T')[0];
+                labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+
+                // 计算当天收入和支出
+                const dayRecords = records.filter(r => r.date === dateStr);
+                let dayIncome = 0;
+                let dayExpense = 0;
+
+                dayRecords.forEach(r => {
+                    if (r.type === 'income') {
+                        dayIncome += r.amount;
+                    } else {
+                        dayExpense += r.amount;
+                    }
+                });
+
+                incomeData.push(dayIncome);
+                expenseData.push(dayExpense);
+            }
+
+            // 如果所有数据都为0，显示空状态
+            const hasData = incomeData.some(v => v > 0) || expenseData.some(v => v > 0);
+
+            if (!hasData) {
+                lineChartCanvas.style.display = 'none';
+                lineChartEmpty.style.display = 'block';
+                if (trendLineChart) {
+                    trendLineChart.destroy();
+                    trendLineChart = null;
+                }
+                return;
+            }
+
+            // 隐藏空状态
+            lineChartCanvas.style.display = 'block';
+            lineChartEmpty.style.display = 'none';
+
+            // 如果图表已存在，销毁它
+            if (trendLineChart) {
+                trendLineChart.destroy();
+            }
+
+            // 创建折线图
+            const ctx = lineChartCanvas.getContext('2d');
+            trendLineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '收入',
+                            data: incomeData,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#22c55e'
+                        },
+                        {
+                            label: '支出',
+                            data: expenseData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ¥${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 标签页切换
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有按钮的 active 类
+                tabBtns.forEach(b => b.classList.remove('active'));
+                // 添加当前按钮的 active 类
+                btn.classList.add('active');
+
+                // 隐藏所有标签页内容
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // 显示对应的标签页内容
+                const tabId = btn.dataset.tab + 'Tab';
+                document.getElementById(tabId).classList.add('active');
+
+                // 更新当前标签页
+                currentTab = btn.dataset.tab;
+
+                // 如果切换到概览标签页，更新图表
+                if (currentTab === 'overview') {
+                    updateCharts();
+                }
+            });
+        });
+
         // 时间周期切换
         periodBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -918,6 +1333,8 @@
                 currentPeriod = btn.dataset.period;
                 // 更新统计数据
                 updateStats();
+                // 更新图表
+                updateCharts();
             });
         });
 
@@ -1019,6 +1436,9 @@
             // 更新统计数据
             updateStats();
 
+            // 更新图表
+            updateCharts();
+
             // 显示成功提示
             showToast();
 
@@ -1117,6 +1537,7 @@
         setDefaultDate();
         renderRecords();
         updateStats();
+        updateCharts();
     </script>
 </body>
 </html>
