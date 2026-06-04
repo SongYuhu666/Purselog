@@ -898,6 +898,64 @@
             }
         }
 
+        /* 导出按钮 */
+        .export-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        /* 导出格式选择器 */
+        .export-format-selector {
+            display: flex;
+            gap: 12px;
+        }
+
+        .format-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--light-bg);
+        }
+
+        .format-option:hover {
+            border-color: var(--primary-light);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .format-option.active {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .format-option input {
+            display: none;
+        }
+
+        .format-option span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
         /* 成功提示 */
         .toast {
             position: fixed;
@@ -1523,7 +1581,12 @@
                     <section class="records-section">
                         <div class="section-header">
                             <h2 class="section-title">最近记录</h2>
-                            <button class="clear-all-btn" id="clearAllBtn">清空所有数据</button>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="export-btn" id="exportBtn">
+                                    📤 导出数据
+                                </button>
+                                <button class="clear-all-btn" id="clearAllBtn">清空所有数据</button>
+                            </div>
                         </div>
                         <div class="records-list" id="recordsList">
                             <div class="empty-state">
@@ -1838,11 +1901,59 @@
         </div>
     </div>
 
+    <!-- 导出数据模态框 -->
+    <div class="modal-overlay" id="exportModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">📤 导出数据</h3>
+                <button class="close-btn" id="exportCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm">
+                    <!-- 导出范围 -->
+                    <div class="form-group">
+                        <label class="form-label">导出范围</label>
+                        <select class="form-input" id="exportRange">
+                            <option value="all">全部数据</option>
+                            <option value="filtered">筛选后的数据</option>
+                        </select>
+                        <div class="input-hint" id="exportRangeHint">导出所有记录</div>
+                    </div>
+
+                    <!-- 导出格式 -->
+                    <div class="form-group">
+                        <label class="form-label">导出格式</label>
+                        <div class="export-format-selector">
+                            <label class="format-option active" data-format="csv">
+                                <input type="radio" name="exportFormat" value="csv" checked>
+                                <span>CSV</span>
+                            </label>
+                            <label class="format-option" data-format="xlsx">
+                                <input type="radio" name="exportFormat" value="xlsx">
+                                <span>Excel (XLSX)</span>
+                            </label>
+                        </div>
+                        <div class="input-hint">CSV 兼容性好，Excel 格式美观</div>
+                    </div>
+
+                    <!-- 按钮组 -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-cancel" id="exportCancelBtn">取消</button>
+                        <button type="submit" class="btn btn-save" id="exportConfirmBtn">导出</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- 成功提示 -->
     <div class="toast" id="toast">
         <span>✓</span>
         <span>保存成功！</span>
     </div>
+
+    <!-- xlsx 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
         // DOM 元素
@@ -1886,6 +1997,16 @@
         const filterSection = document.getElementById('filterSection');
         const filterToggleBtn = document.getElementById('filterToggleBtn');
         const filterBody = document.getElementById('filterBody');
+
+        // 导出相关 DOM 元素
+        const exportBtn = document.getElementById('exportBtn');
+        const exportModalOverlay = document.getElementById('exportModalOverlay');
+        const exportCloseBtn = document.getElementById('exportCloseBtn');
+        const exportCancelBtn = document.getElementById('exportCancelBtn');
+        const exportForm = document.getElementById('exportForm');
+        const exportRange = document.getElementById('exportRange');
+        const exportRangeHint = document.getElementById('exportRangeHint');
+        const exportFormatOptions = document.querySelectorAll('.format-option');
         const filterType = document.getElementById('filterType');
         const filterCategory = document.getElementById('filterCategory');
         const filterStartDate = document.getElementById('filterStartDate');
@@ -2253,6 +2374,177 @@
             const isHidden = filterBody.style.display === 'none';
             filterBody.style.display = isHidden ? 'block' : 'none';
             filterToggleBtn.textContent = isHidden ? '收起' : '展开';
+        }
+
+        // === 数据导出功能 ===
+
+        // 显示导出模态框
+        function showExportModal() {
+            exportModalOverlay.classList.add('active');
+            updateExportRangeHint();
+        }
+
+        // 隐藏导出模态框
+        function hideExportModal() {
+            exportModalOverlay.classList.remove('active');
+        }
+
+        // 更新导出范围提示
+        function updateExportRangeHint() {
+            if (exportRange.value === 'all') {
+                exportRangeHint.textContent = `导出 ${records.length} 条记录`;
+            } else {
+                const filteredCount = getFilteredRecords().length;
+                exportRangeHint.textContent = `导出 ${filteredCount} 条记录`;
+            }
+        }
+
+        // 切换导出格式选中状态
+        function toggleExportFormat(format) {
+            exportFormatOptions.forEach(option => {
+                option.classList.remove('active');
+                const input = option.querySelector('input');
+                input.checked = false;
+            });
+
+            const selectedOption = document.querySelector(`.format-option[data-format="${format}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('active');
+                const input = selectedOption.querySelector('input');
+                input.checked = true;
+            }
+        }
+
+        // 生成文件名
+        function generateFilename(extension) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `记账数据_${year}-${month}-${day}.${extension}`;
+        }
+
+        // 获取分类名称
+        function getCategoryName(record) {
+            if (!record.categoryId) return '';
+            const categoryList = categories[record.type] || [];
+            const category = categoryList.find(c => c.id === record.categoryId);
+            return category ? category.name : '';
+        }
+
+        // 导出为 CSV
+        function exportToCSV(dataToExport) {
+            // 添加表头
+            const headers = ['日期', '类型', '分类', '金额', '备注'];
+
+            // 准备数据行
+            const rows = dataToExport.map(record => {
+                const typeText = record.type === 'income' ? '收入' : '支出';
+                const categoryName = getCategoryName(record);
+                const amountText = record.type === 'income' ? 
+                    record.amount.toFixed(2) : 
+                    '-' + record.amount.toFixed(2);
+
+                return [
+                    record.date,
+                    typeText,
+                    categoryName,
+                    amountText,
+                    record.note || ''
+                ];
+            });
+
+            // 拼接 CSV 内容
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => 
+                    // 处理包含逗号、引号或换行的单元格
+                    /[",\n]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell
+                ).join(','))
+            ].join('\n');
+
+            // 创建下载
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = generateFilename('csv');
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 导出为 Excel (XLSX)
+        function exportToXLSX(dataToExport) {
+            // 准备数据
+            const data = dataToExport.map(record => {
+                const typeText = record.type === 'income' ? '收入' : '支出';
+                const categoryName = getCategoryName(record);
+                const amountText = record.type === 'income' ? 
+                    record.amount.toFixed(2) : 
+                    '-' + record.amount.toFixed(2);
+
+                return {
+                    '日期': record.date,
+                    '类型': typeText,
+                    '分类': categoryName,
+                    '金额': amountText,
+                    '备注': record.note || ''
+                };
+            });
+
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(data);
+
+            // 设置列宽
+            ws['!cols'] = [
+                { wch: 15 }, // 日期
+                { wch: 8 },  // 类型
+                { wch: 12 }, // 分类
+                { wch: 12 }, // 金额
+                { wch: 30 }  // 备注
+            ];
+
+            // 添加工作表
+            XLSX.utils.book_append_sheet(wb, ws, '记账记录');
+
+            // 下载文件
+            XLSX.writeFile(wb, generateFilename('xlsx'));
+        }
+
+        // 执行导出
+        function handleExport() {
+            // 确定要导出的数据
+            let dataToExport;
+            if (exportRange.value === 'all') {
+                dataToExport = records;
+            } else {
+                dataToExport = getFilteredRecords();
+            }
+
+            if (dataToExport.length === 0) {
+                showToast('没有可导出的数据');
+                return;
+            }
+
+            // 按日期排序
+            dataToExport = [...dataToExport].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // 获取选中的格式
+            const selectedFormat = document.querySelector('input[name="exportFormat"]:checked').value;
+
+            // 执行导出
+            if (selectedFormat === 'csv') {
+                exportToCSV(dataToExport);
+            } else {
+                exportToXLSX(dataToExport);
+            }
+
+            // 隐藏模态框
+            hideExportModal();
+
+            // 显示成功提示
+            showToast('导出成功！');
         }
 
         // === GitHub Gist 云端同步功能 ===
@@ -3237,7 +3529,14 @@
         }
 
         // 显示提示信息
-        function showToast() {
+        function showToast(message) {
+            const toastText = toast.querySelector('span:nth-child(2)');
+            if (message && toastText) {
+                toastText.textContent = message;
+            } else if (toastText) {
+                toastText.textContent = '保存成功！';
+            }
+
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -3485,6 +3784,30 @@
             if (e.target === budgetModalOverlay) {
                 hideBudgetModal();
             }
+        });
+
+        // 导出功能事件监听
+        exportBtn.addEventListener('click', showExportModal);
+        exportCloseBtn.addEventListener('click', hideExportModal);
+        exportCancelBtn.addEventListener('click', hideExportModal);
+        exportModalOverlay.addEventListener('click', (e) => {
+            if (e.target === exportModalOverlay) {
+                hideExportModal();
+            }
+        });
+        exportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleExport();
+        });
+
+        // 导出范围变化时更新提示
+        exportRange.addEventListener('change', updateExportRangeHint);
+
+        // 导出格式选择
+        exportFormatOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                toggleExportFormat(option.dataset.format);
+            });
         });
 
         // 设置页面按钮事件监听
