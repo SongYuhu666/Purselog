@@ -382,12 +382,13 @@
         .record-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             padding: 16px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             transition: all 0.2s ease;
             min-height: 72px;
+            gap: 12px;
         }
 
         .record-item:hover {
@@ -395,22 +396,21 @@
             box-shadow: var(--shadow-sm);
         }
 
+        /* 左栏：固定宽度放图标 */
         .record-left {
             display: flex;
             align-items: center;
-            gap: 14px;
-            flex: 1;
-            min-width: 0;
+            flex-shrink: 0;
         }
 
         .record-type {
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             flex-shrink: 0;
         }
 
@@ -422,11 +422,14 @@
             background: #f0fdf4;
         }
 
-        .record-info {
+        /* 中栏：分类文字在上，时间在下，左对齐 */
+        .record-center {
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            min-width: 0;
+            justify-content: center;
+            padding: 4px 0;
         }
 
         .record-note {
@@ -435,26 +438,34 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-size: 1rem;
+            line-height: 1.4;
         }
 
         .record-date {
             font-size: 0.85rem;
             color: var(--text-secondary);
             white-space: nowrap;
+            margin-top: 4px;
+            line-height: 1.4;
         }
 
+        /* 右栏：金额数字在上，删除按钮在下，右对齐 */
         .record-right {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
             flex-shrink: 0;
+            min-width: 0;
         }
 
         .record-amount {
             font-size: 1.25rem;
             font-weight: 700;
             text-align: right;
-            flex-shrink: 0;
+            white-space: nowrap;
+            line-height: 1.3;
         }
 
         .record-amount.expense {
@@ -469,17 +480,16 @@
             background: #fee2e2;
             color: #ef4444;
             border: none;
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             transition: all 0.2s ease;
-            min-height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            line-height: 1.2;
         }
 
         .delete-btn:hover {
@@ -1247,7 +1257,18 @@
             }
 
             .record-item {
-                padding: 14px;
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .record-type {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+            }
+
+            .record-note {
+                font-size: 0.95rem;
             }
 
             .record-amount {
@@ -1606,6 +1627,59 @@
                 .budget-category-input-wrapper {
                     width: 100px;
                 }
+            }
+        }
+
+        /* 针对极小屏幕（320px-375px）的优化 */
+        @media (max-width: 375px) {
+            .container {
+                padding: 12px 10px;
+            }
+
+            .record-item {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .record-type {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .record-note {
+                font-size: 0.9rem;
+            }
+
+            .record-date {
+                font-size: 0.8rem;
+            }
+
+            .record-amount {
+                font-size: 1rem;
+            }
+
+            .delete-btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* 针对小屏幕（376px-430px）的优化 */
+        @media (min-width: 376px) and (max-width: 430px) {
+            .container {
+                padding: 14px 12px;
+            }
+
+            .record-item {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .record-type {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
             }
         }
     </style>
@@ -4421,10 +4495,10 @@
                             <div class="record-type ${record.type}">
                                 ${categoryInfo.icon}
                             </div>
-                            <div class="record-info">
-                                <div class="record-note">${displayText}</div>
-                                <div class="record-date">${dateStr}</div>
-                            </div>
+                        </div>
+                        <div class="record-center">
+                            <div class="record-note">${displayText}</div>
+                            <div class="record-date">${dateStr}</div>
                         </div>
                         <div class="record-right">
                             <div class="record-amount ${record.type}">
