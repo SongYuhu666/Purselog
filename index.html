@@ -766,6 +766,138 @@
             background: var(--primary-dark);
         }
 
+        /* 筛选栏样式 */
+        .filter-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .filter-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .filter-toggle-btn {
+            background: var(--light-bg);
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .filter-toggle-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .filter-body {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        .filter-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .filter-select,
+        .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: var(--white);
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .filter-select {
+            cursor: pointer;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .filter-actions .btn {
+            flex: 1;
+        }
+
+        .filter-result-summary {
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--light-bg);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .filter-result-summary span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* 响应式筛选栏 */
+        @media (max-width: 480px) {
+            .filter-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .filter-group {
+                flex: 1 1 100%;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+            }
+        }
+
         /* 成功提示 */
         .toast {
             position: fixed;
@@ -1311,6 +1443,82 @@
                         </button>
                     </div>
 
+                    <!-- 筛选栏 -->
+                    <div class="filter-section" id="filterSection">
+                        <div class="filter-header">
+                            <h3 class="filter-title">🔍 筛选条件</h3>
+                            <button class="filter-toggle-btn" id="filterToggleBtn">展开</button>
+                        </div>
+                        <div class="filter-body" id="filterBody" style="display: none;">
+                            <!-- 第一行：收支类型 -->
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="filter-label">收支类型</label>
+                                    <select class="filter-select" id="filterType">
+                                        <option value="all">全部</option>
+                                        <option value="income">收入</option>
+                                        <option value="expense">支出</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">分类</label>
+                                    <select class="filter-select" id="filterCategory">
+                                        <option value="all">全部</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 第二行：时间范围 -->
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="filter-label">开始日期</label>
+                                    <input type="date" class="filter-input" id="filterStartDate">
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">结束日期</label>
+                                    <input type="date" class="filter-input" id="filterEndDate">
+                                </div>
+                            </div>
+
+                            <!-- 第三行：金额范围 -->
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label class="filter-label">最小金额</label>
+                                    <input type="number" class="filter-input" id="filterMinAmount" 
+                                           placeholder="0.00" min="0" step="0.01">
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">最大金额</label>
+                                    <input type="number" class="filter-input" id="filterMaxAmount" 
+                                           placeholder="无上限" min="0" step="0.01">
+                                </div>
+                            </div>
+
+                            <!-- 第四行：关键词搜索 -->
+                            <div class="filter-row">
+                                <div class="filter-group full-width">
+                                    <label class="filter-label">关键词搜索</label>
+                                    <input type="text" class="filter-input" id="filterKeyword" 
+                                           placeholder="搜索备注关键词...">
+                                </div>
+                            </div>
+
+                            <!-- 按钮行 -->
+                            <div class="filter-actions">
+                                <button type="button" class="btn btn-cancel" id="resetFilterBtn">
+                                    🔄 重置筛选
+                                </button>
+                                <button type="button" class="btn btn-save" id="applyFilterBtn">
+                                    ✅ 应用筛选
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 筛选结果统计 -->
+                        <div class="filter-result-summary" id="filterResultSummary" style="display: none;">
+                            <span id="filterResultCount">0</span> 条记录
+                        </div>
+                    </div>
+
                     <!-- 记录列表 -->
                     <section class="records-section">
                         <div class="section-header">
@@ -1674,6 +1882,22 @@
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
 
+        // 筛选相关 DOM 元素
+        const filterSection = document.getElementById('filterSection');
+        const filterToggleBtn = document.getElementById('filterToggleBtn');
+        const filterBody = document.getElementById('filterBody');
+        const filterType = document.getElementById('filterType');
+        const filterCategory = document.getElementById('filterCategory');
+        const filterStartDate = document.getElementById('filterStartDate');
+        const filterEndDate = document.getElementById('filterEndDate');
+        const filterMinAmount = document.getElementById('filterMinAmount');
+        const filterMaxAmount = document.getElementById('filterMaxAmount');
+        const filterKeyword = document.getElementById('filterKeyword');
+        const resetFilterBtn = document.getElementById('resetFilterBtn');
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
+        const filterResultSummary = document.getElementById('filterResultSummary');
+        const filterResultCount = document.getElementById('filterResultCount');
+
         // 图表相关 DOM 元素
         const pieChartCanvas = document.getElementById('expensePieChart');
         const lineChartCanvas = document.getElementById('trendLineChart');
@@ -1867,6 +2091,169 @@
             total: 0,  // 总预算
             categories: {}  // 分类预算 {categoryId: amount}
         };
+
+        // === 筛选功能 ===
+
+        // 筛选状态
+        let filterState = {
+            type: 'all',
+            category: 'all',
+            startDate: '',
+            endDate: '',
+            minAmount: '',
+            maxAmount: '',
+            keyword: ''
+        };
+
+        // 是否有活跃的筛选条件
+        let hasActiveFilters = false;
+
+        // 获取所有分类选项
+        function updateFilterCategoryOptions() {
+            // 清空现有选项
+            filterCategory.innerHTML = '<option value="all">全部</option>';
+            
+            // 添加所有分类选项
+            categories.expense.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = `${cat.icon} ${cat.name}`;
+                filterCategory.appendChild(option);
+            });
+            
+            categories.income.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = `${cat.icon} ${cat.name}`;
+                filterCategory.appendChild(option);
+            });
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            // 获取筛选条件
+            filterState = {
+                type: filterType.value,
+                category: filterCategory.value,
+                startDate: filterStartDate.value,
+                endDate: filterEndDate.value,
+                minAmount: filterMinAmount.value,
+                maxAmount: filterMaxAmount.value,
+                keyword: filterKeyword.value.trim().toLowerCase()
+            };
+            
+            // 检查是否有活跃的筛选条件
+            hasActiveFilters = filterState.type !== 'all' || 
+                              filterState.category !== 'all' ||
+                              filterState.startDate !== '' ||
+                              filterState.endDate !== '' ||
+                              filterState.minAmount !== '' ||
+                              filterState.maxAmount !== '' ||
+                              filterState.keyword !== '';
+            
+            // 重新渲染记录列表
+            renderRecords();
+            
+            // 显示筛选结果统计
+            if (hasActiveFilters) {
+                filterResultSummary.style.display = 'block';
+                filterResultCount.textContent = getFilteredRecords().length;
+            } else {
+                filterResultSummary.style.display = 'none';
+            }
+        }
+
+        // 获取筛选后的记录
+        function getFilteredRecords() {
+            let filtered = [...records];
+            
+            // 按类型筛选
+            if (filterState.type !== 'all') {
+                filtered = filtered.filter(record => record.type === filterState.type);
+            }
+            
+            // 按分类筛选
+            if (filterState.category !== 'all') {
+                filtered = filtered.filter(record => record.categoryId === filterState.category);
+            }
+            
+            // 按开始日期筛选
+            if (filterState.startDate) {
+                filtered = filtered.filter(record => record.date >= filterState.startDate);
+            }
+            
+            // 按结束日期筛选
+            if (filterState.endDate) {
+                filtered = filtered.filter(record => record.date <= filterState.endDate);
+            }
+            
+            // 按最小金额筛选
+            if (filterState.minAmount !== '') {
+                const minAmount = parseFloat(filterState.minAmount);
+                if (!isNaN(minAmount)) {
+                    filtered = filtered.filter(record => record.amount >= minAmount);
+                }
+            }
+            
+            // 按最大金额筛选
+            if (filterState.maxAmount !== '') {
+                const maxAmount = parseFloat(filterState.maxAmount);
+                if (!isNaN(maxAmount)) {
+                    filtered = filtered.filter(record => record.amount <= maxAmount);
+                }
+            }
+            
+            // 按关键词搜索（搜索备注）
+            if (filterState.keyword) {
+                filtered = filtered.filter(record => 
+                    record.note && record.note.toLowerCase().includes(filterState.keyword)
+                );
+            }
+            
+            return filtered;
+        }
+
+        // 重置筛选
+        function resetFilters() {
+            // 重置表单值
+            filterType.value = 'all';
+            filterCategory.value = 'all';
+            filterStartDate.value = '';
+            filterEndDate.value = '';
+            filterMinAmount.value = '';
+            filterMaxAmount.value = '';
+            filterKeyword.value = '';
+            
+            // 重置筛选状态
+            filterState = {
+                type: 'all',
+                category: 'all',
+                startDate: '',
+                endDate: '',
+                minAmount: '',
+                maxAmount: '',
+                keyword: ''
+            };
+            
+            // 重置活跃筛选标志
+            hasActiveFilters = false;
+            
+            // 隐藏筛选结果统计
+            filterResultSummary.style.display = 'none';
+            
+            // 重新渲染记录列表
+            renderRecords();
+            
+            // 显示提示
+            showToast('筛选条件已重置');
+        }
+
+        // 切换筛选栏显示
+        function toggleFilterBody() {
+            const isHidden = filterBody.style.display === 'none';
+            filterBody.style.display = isHidden ? 'block' : 'none';
+            filterToggleBtn.textContent = isHidden ? '收起' : '展开';
+        }
 
         // === GitHub Gist 云端同步功能 ===
 
@@ -2636,6 +3023,9 @@
                     </div>
                 </div>
             `).join('');
+            
+            // 同时更新筛选栏的分类选项
+            updateFilterCategoryOptions();
         }
 
         // 显示添加分类模态框
@@ -2783,8 +3173,18 @@
                     updateCharts();
                     updateBudgets();
                 }
+                
+                // 如果切换到账单标签页，更新筛选栏分类选项
+                if (currentTab === 'records') {
+                    updateFilterCategoryOptions();
+                }
             });
         });
+
+        // 筛选事件监听
+        filterToggleBtn.addEventListener('click', toggleFilterBody);
+        applyFilterBtn.addEventListener('click', applyFilters);
+        resetFilterBtn.addEventListener('click', resetFilters);
 
         // 时间周期切换
         periodBtns.forEach(btn => {
@@ -2951,18 +3351,21 @@
 
         // 渲染记录列表
         function renderRecords() {
-            if (records.length === 0) {
+            // 如果有活跃的筛选条件，使用筛选后的记录
+            let displayRecords = hasActiveFilters ? getFilteredRecords() : records;
+            
+            if (displayRecords.length === 0) {
                 recordsList.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📝</div>
-                        <div>暂无记账记录</div>
+                        <div>${hasActiveFilters ? '没有符合条件的记录' : '暂无记账记录'}</div>
                     </div>
                 `;
                 return;
             }
 
             // 按日期倒序排列（最新的在最上面）
-            const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sortedRecords = [...displayRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             recordsList.innerHTML = sortedRecords.map(record => {
                 // 获取分类信息
