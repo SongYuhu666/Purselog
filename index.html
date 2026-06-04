@@ -1800,6 +1800,342 @@
                 font-size: 1.3rem;
             }
         }
+
+        /* ============================================
+           移动端账单记录布局优化 (屏幕宽度 ≤ 768px)
+           ============================================ */
+        @media (max-width: 768px) {
+            /* 移动端账单记录卡片布局重构 */
+            .record-item {
+                display: flex;
+                flex-direction: column;
+                padding: 14px;
+                gap: 10px;
+                min-height: auto;
+            }
+
+            /* 第一行：图标 + 分类名称 + 金额 */
+            .record-item-top {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                width: 100%;
+                gap: 12px;
+            }
+
+            /* 左侧：图标 + 分类名称垂直排列 */
+            .record-item-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex-shrink: 0;
+            }
+
+            /* 移动端图标保持原有样式 */
+            .record-item .record-type {
+                width: 44px;
+                height: 44px;
+                font-size: 1.3rem;
+            }
+
+            /* 分类名称 */
+            .record-item .record-note {
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: var(--text-primary);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 120px;
+            }
+
+            /* 右侧金额 */
+            .record-item .record-amount {
+                font-size: 1.15rem;
+                font-weight: 700;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            /* 第二行：日期 */
+            .record-item-middle {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                padding-left: 54px; /* 图标宽度 + 间距 */
+            }
+
+            .record-item .record-date {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                white-space: nowrap;
+            }
+
+            /* 第三行：按钮组 */
+            .record-item-bottom {
+                display: flex;
+                justify-content: flex-end;
+                gap: 8px;
+                width: 100%;
+                padding-top: 4px;
+            }
+
+            .record-item-bottom .edit-btn,
+            .record-item-bottom .delete-btn {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+
+            /* 隐藏原有的中间列和右列布局 */
+            .record-item .record-center,
+            .record-item .record-right {
+                display: none;
+            }
+        }
+
+        /* 针对极小屏幕（320px-375px）的移动端优化 */
+        @media (max-width: 375px) {
+            .record-item {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .record-item .record-type {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .record-item .record-note {
+                font-size: 0.9rem;
+                max-width: 100px;
+            }
+
+            .record-item .record-amount {
+                font-size: 1.05rem;
+            }
+
+            .record-item-middle {
+                padding-left: 50px;
+            }
+
+            .record-item .record-date {
+                font-size: 0.8rem;
+            }
+
+            .record-item-bottom .edit-btn,
+            .record-item-bottom .delete-btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* ============================================
+           预算模块UI优化
+           ============================================ */
+
+        /* 预算总览项 - 带圆角背景条 */
+        .budget-overview-bar {
+            background: #f1f5f9;
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .budget-overview-bar:last-child {
+            margin-bottom: 0;
+        }
+
+        .budget-overview-bar .budget-bar-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .budget-overview-bar .budget-bar-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .budget-overview-bar .budget-bar-value.total {
+            color: var(--text-primary);
+        }
+
+        .budget-overview-bar .budget-bar-value.used {
+            color: #ef4444;
+        }
+
+        .budget-overview-bar .budget-bar-value.remaining {
+            color: #22c55e;
+        }
+
+        .budget-overview-bar .budget-bar-value.remaining.negative {
+            color: #ef4444;
+        }
+
+        .budget-overview-bar .budget-bar-percent {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        /* 分类预算项 - 单行布局 */
+        .budget-category-bar {
+            background: #f1f5f9;
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .budget-category-bar:last-child {
+            margin-bottom: 0;
+        }
+
+        .budget-category-bar:hover {
+            background: #e2e8f0;
+        }
+
+        /* 分类图标和名称 */
+        .budget-cat-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        .budget-cat-icon {
+            font-size: 1.3rem;
+        }
+
+        .budget-cat-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        /* 进度条 */
+        .budget-cat-progress {
+            flex: 1;
+            min-width: 60px;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .budget-cat-progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .budget-cat-progress-fill.normal {
+            background: #3b82f6;
+        }
+
+        .budget-cat-progress-fill.warning {
+            background: #f59e0b;
+        }
+
+        .budget-cat-progress-fill.over {
+            background: #ef4444;
+        }
+
+        /* 金额和超支提示 */
+        .budget-cat-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .budget-cat-amount {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .budget-cat-over {
+            font-size: 0.8rem;
+            color: #ef4444;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .budget-cat-unset {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* 移动端预算样式适配 */
+        @media (max-width: 768px) {
+            .budget-overview-bar {
+                padding: 12px 14px;
+            }
+
+            .budget-overview-bar .budget-bar-label {
+                font-size: 0.9rem;
+            }
+
+            .budget-overview-bar .budget-bar-value {
+                font-size: 1rem;
+            }
+
+            .budget-category-bar {
+                padding: 12px 14px;
+                flex-wrap: wrap;
+            }
+
+            .budget-cat-left {
+                min-width: 70px;
+            }
+
+            .budget-cat-icon {
+                font-size: 1.2rem;
+            }
+
+            .budget-cat-name {
+                font-size: 0.9rem;
+            }
+
+            .budget-cat-progress {
+                order: 3;
+                width: 100%;
+                flex: none;
+                margin-top: 8px;
+            }
+
+            .budget-cat-right {
+                order: 2;
+            }
+
+            .budget-cat-amount {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* 分类预算输入框 - 移除多余的¥符号 */
+        .budget-category-input-wrapper .currency-symbol {
+            display: none;
+        }
+
+        .budget-category-input-wrapper input {
+            padding-left: 12px !important;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -1922,18 +2258,22 @@
                                 <div class="budget-empty-icon">📋</div>
                                 <div>还没有设置预算，点击右上角按钮开始管理</div>
                             </div>
+                            <!-- 新的预算总览布局 -->
                             <div class="budget-overview" id="budgetOverview" style="display: none;">
-                                <div class="budget-overview-item">
-                                    <div class="budget-overview-label">总预算</div>
-                                    <div class="budget-overview-value total" id="budgetTotal">¥0.00</div>
+                                <div class="budget-overview-bar">
+                                    <span class="budget-bar-label">总预算</span>
+                                    <span class="budget-bar-value total" id="budgetTotal">¥0.00</span>
                                 </div>
-                                <div class="budget-overview-item">
-                                    <div class="budget-overview-label">已使用</div>
-                                    <div class="budget-overview-value used" id="budgetUsed">¥0.00</div>
+                                <div class="budget-overview-bar">
+                                    <span class="budget-bar-label">已使用</span>
+                                    <span>
+                                        <span class="budget-bar-value used" id="budgetUsed">¥0.00</span>
+                                        <span class="budget-bar-percent" id="budgetPercent"></span>
+                                    </span>
                                 </div>
-                                <div class="budget-overview-item">
-                                    <div class="budget-overview-label">剩余</div>
-                                    <div class="budget-overview-value remaining" id="budgetRemaining">¥0.00</div>
+                                <div class="budget-overview-bar">
+                                    <span class="budget-bar-label">剩余</span>
+                                    <span class="budget-bar-value remaining" id="budgetRemaining">¥0.00</span>
                                 </div>
                             </div>
                             <div class="budget-progress-wrapper" id="budgetProgressWrapper" style="display: none;">
@@ -4136,7 +4476,7 @@
 
             // 有预算，显示概览
             if (budgetEmpty) budgetEmpty.style.display = 'none';
-            if (budgetOverview) budgetOverview.style.display = 'grid';
+            if (budgetOverview) budgetOverview.style.display = 'block';
             if (budgetProgressWrapper) budgetProgressWrapper.style.display = 'block';
 
             const usedAmount = getTotalMonthExpense();
@@ -4144,17 +4484,28 @@
             const percentage = totalBudget > 0 ? (usedAmount / totalBudget) * 100 : 0;
             const status = getBudgetStatus(percentage);
 
-            // 更新总预算概览显示
+            // 更新总预算概览显示 - 使用新布局
             budgetTotal.textContent = `¥${totalBudget.toFixed(2)}`;
             budgetUsed.textContent = `¥${usedAmount.toFixed(2)}`;
-            budgetRemaining.textContent = `¥${remainingAmount.toFixed(2)}`;
+
+            // 更新百分比显示 - 当总预算为0时不显示百分比
+            const budgetPercent = document.getElementById('budgetPercent');
+            if (budgetPercent) {
+                if (totalBudget > 0) {
+                    budgetPercent.textContent = `(${Math.round(percentage)}%)`;
+                } else {
+                    budgetPercent.textContent = '';
+                }
+            }
+
+            budgetRemaining.textContent = `¥${Math.abs(remainingAmount).toFixed(2)}`;
 
             // 设置剩余金额颜色
             if (remainingAmount >= 0) {
-                budgetRemaining.className = 'budget-overview-value remaining';
+                budgetRemaining.className = 'budget-bar-value remaining';
                 budgetRemaining.style.color = '#22c55e';
             } else {
-                budgetRemaining.className = 'budget-overview-value remaining';
+                budgetRemaining.className = 'budget-bar-value remaining negative';
                 budgetRemaining.style.color = '#ef4444';
             }
 
@@ -4192,26 +4543,33 @@
                 const remainingAmount = budgetAmount - usedAmount;
                 const percentage = budgetAmount > 0 ? (usedAmount / budgetAmount) * 100 : 0;
                 const status = getBudgetStatus(percentage);
+                const isOverBudget = remainingAmount < 0;
 
-                // 如果没有设置该分类预算，不显示
-                if (budgetAmount <= 0) {
-                    return '';
+                // 获取进度条颜色（根据百分比）
+                let progressColor = category.color; // 使用分类颜色
+                let progressStatus = 'normal';
+                if (percentage >= 100) {
+                    progressStatus = 'over';
+                } else if (percentage >= 80) {
+                    progressStatus = 'warning';
                 }
 
                 return `
-                    <div class="budget-category-item">
-                        <div class="budget-category-icon">${category.icon}</div>
-                        <div class="budget-category-info">
-                            <div class="budget-category-header">
-                                <span class="budget-category-name">${category.name}</span>
-                                <span class="budget-category-amount">¥${usedAmount.toFixed(2)} / ¥${budgetAmount.toFixed(2)}</span>
-                            </div>
-                            <div class="budget-category-progress">
-                                <div class="budget-category-progress-fill ${status}" style="width: ${Math.min(percentage, 100)}%; background: ${category.color};"></div>
-                            </div>
-                            <div class="budget-category-remaining ${remainingAmount < 0 ? 'over' : ''}">
-                                ${remainingAmount >= 0 ? `剩余 ¥${remainingAmount.toFixed(2)}` : `超支 ¥${Math.abs(remainingAmount).toFixed(2)}`}
-                            </div>
+                    <div class="budget-category-bar">
+                        <div class="budget-cat-left">
+                            <span class="budget-cat-icon">${category.icon}</span>
+                            <span class="budget-cat-name">${category.name}</span>
+                        </div>
+                        <div class="budget-cat-progress">
+                            <div class="budget-cat-progress-fill ${progressStatus}" style="width: ${Math.min(percentage, 100)}%;"></div>
+                        </div>
+                        <div class="budget-cat-right">
+                            ${budgetAmount > 0 ? `
+                                <span class="budget-cat-amount">¥${usedAmount.toFixed(2)} / ¥${budgetAmount.toFixed(2)}</span>
+                                ${isOverBudget ? `<span class="budget-cat-over">(超支¥${Math.abs(remainingAmount).toFixed(2)})</span>` : ''}
+                            ` : `
+                                <span class="budget-cat-unset">未设置</span>
+                            `}
                         </div>
                     </div>
                 `;
@@ -4894,10 +5252,10 @@
                         categoryInfo = { icon: category.icon, name: category.name };
                     }
                 }
-                
+
                 const amountPrefix = record.type === 'expense' ? '-' : '+';
                 const dateStr = formatDate(record.date);
-                
+
                 // 显示分类名称和备注
                 let displayText = categoryInfo.name;
                 if (record.note && record.note !== categoryInfo.name && record.note !== (record.type === 'expense' ? '支出' : '收入')) {
@@ -4909,6 +5267,26 @@
 
                 return `
                     <div class="record-item">
+                        <!-- 移动端布局：重新组织结构 -->
+                        <div class="record-item-top">
+                            <div class="record-item-left">
+                                <div class="record-type ${record.type}">
+                                    ${categoryInfo.icon}
+                                </div>
+                                <span class="record-note">${displayText}</span>
+                            </div>
+                            <div class="record-amount ${record.type}">
+                                ${amountPrefix}¥${record.amount.toFixed(2)}
+                            </div>
+                        </div>
+                        <div class="record-item-middle">
+                            <span class="record-date">${dateStr}</span>
+                        </div>
+                        <div class="record-item-bottom">
+                            <button class="edit-btn" onclick="showEditModal(${record.id})">编辑</button>
+                            <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
+                        </div>
+                        <!-- 桌面端布局：保留原有结构（移动端通过CSS隐藏） -->
                         <div class="record-left">
                             <div class="record-type ${record.type}">
                                 ${categoryInfo.icon}
