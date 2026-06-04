@@ -999,7 +999,7 @@
             position: absolute;
             top: 100%;
             left: 0;
-            right: 0;
+            min-width: 280px;
             margin-top: 8px;
             background: var(--white);
             border-radius: var(--radius-md);
@@ -1043,6 +1043,9 @@
         .ledger-item-name {
             flex: 1;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .ledger-item-actions {
