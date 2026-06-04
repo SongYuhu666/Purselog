@@ -1802,94 +1802,143 @@
         }
 
         /* ============================================
-           移动端账单记录布局优化 (屏幕宽度 ≤ 768px)
+           账单记录布局 - 桌面端 (屏幕宽度 > 768px)
+           ============================================ */
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+            min-height: 72px;
+            gap: 12px;
+        }
+
+        .record-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 桌面端布局显示 */
+        .record-layout-desktop {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .record-text-desktop {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .record-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 1rem;
+        }
+
+        .record-date-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .record-buttons {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        /* 移动端布局默认隐藏 */
+        .record-layout-mobile {
+            display: none;
+        }
+
+        /* ============================================
+           账单记录布局 - 移动端 (屏幕宽度 ≤ 768px)
            ============================================ */
         @media (max-width: 768px) {
-            /* 移动端账单记录卡片布局重构 */
-            .record-item {
+            /* 桌面端布局隐藏 */
+            .record-layout-desktop {
+                display: none;
+            }
+
+            /* 移动端布局显示 */
+            .record-layout-mobile {
                 display: flex;
                 flex-direction: column;
-                padding: 14px;
+                width: 100%;
                 gap: 10px;
+            }
+
+            .record-item {
+                padding: 14px;
                 min-height: auto;
             }
 
-            /* 第一行：图标 + 分类名称 + 金额 */
-            .record-item-top {
+            /* 移动端第一行：图标+名称 + 金额 */
+            .record-mobile-top {
                 display: flex;
-                align-items: flex-start;
+                align-items: center;
                 justify-content: space-between;
                 width: 100%;
                 gap: 12px;
             }
 
-            /* 左侧：图标 + 分类名称垂直排列 */
-            .record-item-left {
+            .record-mobile-left {
                 display: flex;
                 align-items: center;
                 gap: 10px;
                 flex-shrink: 0;
+                min-width: 0;
             }
 
-            /* 移动端图标保持原有样式 */
-            .record-item .record-type {
-                width: 44px;
-                height: 44px;
-                font-size: 1.3rem;
-            }
-
-            /* 分类名称 */
-            .record-item .record-note {
+            .record-note {
                 font-size: 0.95rem;
                 font-weight: 500;
                 color: var(--text-primary);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                max-width: 120px;
+                max-width: 140px;
             }
 
-            /* 右侧金额 */
-            .record-item .record-amount {
-                font-size: 1.15rem;
-                font-weight: 700;
-                white-space: nowrap;
-                flex-shrink: 0;
-            }
-
-            /* 第二行：日期 */
-            .record-item-middle {
+            /* 移动端第二行：日期 + 按钮 */
+            .record-mobile-bottom {
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 width: 100%;
-                padding-left: 54px; /* 图标宽度 + 间距 */
+                padding-left: 54px;
             }
 
-            .record-item .record-date {
+            .record-date {
                 font-size: 0.85rem;
                 color: var(--text-secondary);
                 white-space: nowrap;
             }
 
-            /* 第三行：按钮组 */
-            .record-item-bottom {
+            .record-buttons-mobile {
                 display: flex;
-                justify-content: flex-end;
                 gap: 8px;
-                width: 100%;
-                padding-top: 4px;
             }
 
-            .record-item-bottom .edit-btn,
-            .record-item-bottom .delete-btn {
+            /* 调整按钮大小适合移动端 */
+            .record-buttons-mobile .edit-btn,
+            .record-buttons-mobile .delete-btn {
                 padding: 6px 14px;
                 font-size: 0.8rem;
-            }
-
-            /* 隐藏原有的中间列和右列布局 */
-            .record-item .record-center,
-            .record-item .record-right {
-                display: none;
             }
         }
 
@@ -1900,31 +1949,27 @@
                 gap: 8px;
             }
 
-            .record-item .record-type {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
+            .record-type {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.2rem !important;
             }
 
-            .record-item .record-note {
+            .record-note {
                 font-size: 0.9rem;
-                max-width: 100px;
+                max-width: 110px;
             }
 
-            .record-item .record-amount {
-                font-size: 1.05rem;
-            }
-
-            .record-item-middle {
+            .record-mobile-bottom {
                 padding-left: 50px;
             }
 
-            .record-item .record-date {
+            .record-date {
                 font-size: 0.8rem;
             }
 
-            .record-item-bottom .edit-btn,
-            .record-item-bottom .delete-btn {
+            .record-buttons-mobile .edit-btn,
+            .record-buttons-mobile .delete-btn {
                 padding: 5px 10px;
                 font-size: 0.75rem;
             }
@@ -1933,6 +1978,27 @@
         /* ============================================
            预算模块UI优化
            ============================================ */
+
+        /* 预算设置按钮样式 */
+        .budget-set-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .budget-set-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
 
         /* 预算总览项 - 带圆角背景条 */
         .budget-overview-bar {
@@ -1979,8 +2045,20 @@
 
         .budget-overview-bar .budget-bar-percent {
             font-size: 0.9rem;
-            color: var(--text-secondary);
+            font-weight: 500;
             margin-left: 4px;
+        }
+
+        .budget-overview-bar .budget-bar-value.used + .budget-bar-percent {
+            color: #ef4444;
+        }
+
+        .budget-overview-bar .budget-bar-value.remaining + .budget-bar-percent {
+            color: #22c55e;
+        }
+
+        .budget-overview-bar .budget-bar-value.remaining.negative + .budget-bar-percent {
+            color: #ef4444;
         }
 
         /* 分类预算项 - 单行布局 */
@@ -2251,7 +2329,7 @@
                             <div class="budget-card-header">
                                 <h3 class="budget-card-title">💼 本月预算</h3>
                                 <button class="budget-set-btn" id="budgetSetBtn">
-                                    ⚙️ 设置预算
+                                    设置预算
                                 </button>
                             </div>
                             <div class="budget-empty" id="budgetEmpty">
@@ -2273,7 +2351,10 @@
                                 </div>
                                 <div class="budget-overview-bar">
                                     <span class="budget-bar-label">剩余</span>
-                                    <span class="budget-bar-value remaining" id="budgetRemaining">¥0.00</span>
+                                    <span>
+                                        <span class="budget-bar-value remaining" id="budgetRemaining">¥0.00</span>
+                                        <span class="budget-bar-percent" id="budgetRemainingPercent"></span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="budget-progress-wrapper" id="budgetProgressWrapper" style="display: none;">
@@ -4481,24 +4562,34 @@
 
             const usedAmount = getTotalMonthExpense();
             const remainingAmount = totalBudget - usedAmount;
-            const percentage = totalBudget > 0 ? (usedAmount / totalBudget) * 100 : 0;
-            const status = getBudgetStatus(percentage);
+            const usedPercentage = totalBudget > 0 ? (usedAmount / totalBudget) * 100 : 0;
+            const remainingPercentage = totalBudget > 0 ? (remainingAmount / totalBudget) * 100 : 0;
+            const status = getBudgetStatus(usedPercentage);
 
             // 更新总预算概览显示 - 使用新布局
             budgetTotal.textContent = `¥${totalBudget.toFixed(2)}`;
             budgetUsed.textContent = `¥${usedAmount.toFixed(2)}`;
 
-            // 更新百分比显示 - 当总预算为0时不显示百分比
+            // 更新已使用百分比显示 - 当总预算为0时不显示百分比
             const budgetPercent = document.getElementById('budgetPercent');
             if (budgetPercent) {
                 if (totalBudget > 0) {
-                    budgetPercent.textContent = `(${Math.round(percentage)}%)`;
+                    budgetPercent.textContent = `(${Math.round(usedPercentage)}%)`;
                 } else {
                     budgetPercent.textContent = '';
                 }
             }
 
+            // 更新剩余金额和百分比
             budgetRemaining.textContent = `¥${Math.abs(remainingAmount).toFixed(2)}`;
+            const budgetRemainingPercent = document.getElementById('budgetRemainingPercent');
+            if (budgetRemainingPercent) {
+                if (totalBudget > 0) {
+                    budgetRemainingPercent.textContent = `(${Math.max(0, Math.round(remainingPercentage))}%)`;
+                } else {
+                    budgetRemainingPercent.textContent = '';
+                }
+            }
 
             // 设置剩余金额颜色
             if (remainingAmount >= 0) {
@@ -4510,13 +4601,13 @@
             }
 
             // 更新进度条
-            budgetProgressFill.style.width = `${Math.min(percentage, 100)}%`;
+            budgetProgressFill.style.width = `${Math.min(usedPercentage, 100)}%`;
             budgetProgressFill.className = `budget-progress-fill ${status}`;
 
             // 更新进度条百分比文字
             const budgetProgressText = document.getElementById('budgetProgressText');
             if (budgetProgressText) {
-                budgetProgressText.textContent = `${Math.round(percentage)}%`;
+                budgetProgressText.textContent = `${Math.round(usedPercentage)}%`;
             }
         }
 
@@ -5226,6 +5317,9 @@
 
         // 渲染记录列表
         function renderRecords() {
+            // 先清空列表，避免重复
+            recordsList.innerHTML = '';
+            
             // 如果有活跃的筛选条件，使用筛选后的记录
             let displayRecords = hasActiveFilters ? getFilteredRecords() : records;
             
@@ -5242,6 +5336,7 @@
             // 按日期倒序排列（最新的在最上面）
             const sortedRecords = [...displayRecords].sort((a, b) => new Date(b.date) - new Date(a.date));
 
+            // 统一渲染所有记录
             recordsList.innerHTML = sortedRecords.map(record => {
                 // 获取分类信息
                 let categoryInfo = { icon: record.type === 'expense' ? '💸' : '💰', name: '' };
@@ -5265,44 +5360,45 @@
                     displayText = record.note || (record.type === 'expense' ? '支出' : '收入');
                 }
 
+                // 统一渲染结构（CSS根据屏幕宽度自动适配）
                 return `
-                    <div class="record-item">
-                        <!-- 移动端布局：重新组织结构 -->
-                        <div class="record-item-top">
-                            <div class="record-item-left">
-                                <div class="record-type ${record.type}">
-                                    ${categoryInfo.icon}
-                                </div>
-                                <span class="record-note">${displayText}</span>
-                            </div>
-                            <div class="record-amount ${record.type}">
-                                ${amountPrefix}¥${record.amount.toFixed(2)}
-                            </div>
-                        </div>
-                        <div class="record-item-middle">
-                            <span class="record-date">${dateStr}</span>
-                        </div>
-                        <div class="record-item-bottom">
-                            <button class="edit-btn" onclick="showEditModal(${record.id})">编辑</button>
-                            <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
-                        </div>
-                        <!-- 桌面端布局：保留原有结构（移动端通过CSS隐藏） -->
-                        <div class="record-left">
+                    <div class="record-item" data-record-id="${record.id}">
+                        <!-- 桌面端布局 - 单行布局 -->
+                        <div class="record-layout-desktop">
                             <div class="record-type ${record.type}">
                                 ${categoryInfo.icon}
                             </div>
-                        </div>
-                        <div class="record-center">
-                            <div class="record-note">${displayText}</div>
-                            <div class="record-date">${dateStr}</div>
-                        </div>
-                        <div class="record-right">
+                            <div class="record-text-desktop">
+                                <span class="record-name">${displayText}</span>
+                                <span class="record-date-text">${dateStr}</span>
+                            </div>
                             <div class="record-amount ${record.type}">
                                 ${amountPrefix}¥${record.amount.toFixed(2)}
                             </div>
-                            <div style="display: flex; gap: 6px;">
+                            <div class="record-buttons">
                                 <button class="edit-btn" onclick="showEditModal(${record.id})">编辑</button>
                                 <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
+                            </div>
+                        </div>
+                        <!-- 移动端布局 - 两行布局 -->
+                        <div class="record-layout-mobile">
+                            <div class="record-mobile-top">
+                                <div class="record-mobile-left">
+                                    <div class="record-type ${record.type}">
+                                        ${categoryInfo.icon}
+                                    </div>
+                                    <span class="record-note">${displayText}</span>
+                                </div>
+                                <div class="record-amount ${record.type}">
+                                    ${amountPrefix}¥${record.amount.toFixed(2)}
+                                </div>
+                            </div>
+                            <div class="record-mobile-bottom">
+                                <span class="record-date">${dateStr}</span>
+                                <div class="record-buttons-mobile">
+                                    <button class="edit-btn" onclick="showEditModal(${record.id})">编辑</button>
+                                    <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
+                                </div>
                             </div>
                         </div>
                     </div>
