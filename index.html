@@ -497,6 +497,28 @@
             color: var(--white);
         }
 
+        /* 编辑按钮样式 */
+        .edit-btn {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .edit-btn:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
         /* 模态框 */
         .modal-overlay {
             position: fixed;
@@ -2030,11 +2052,14 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">记一笔</h3>
+                <h3 class="modal-title" id="modalTitle">记一笔</h3>
                 <button class="close-btn" id="closeBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="recordForm">
+                    <!-- 隐藏字段，用于存储正在编辑的记录ID -->
+                    <input type="hidden" id="editingRecordId">
+
                     <!-- 类型选择 -->
                     <div class="form-group">
                         <label class="form-label">类型</label>
@@ -2082,7 +2107,7 @@
                     <!-- 按钮组 -->
                     <div class="btn-group">
                         <button type="button" class="btn btn-cancel" id="cancelBtn">取消</button>
-                        <button type="submit" class="btn btn-save">保存</button>
+                        <button type="submit" class="btn btn-save" id="saveBtn">保存</button>
                     </div>
                 </form>
             </div>
@@ -4315,6 +4340,8 @@
         // 隐藏模态框
         function hideModal() {
             modalOverlay.classList.remove('active');
+            // 重置表单为新增模式（清除编辑状态）
+            resetFormToAddMode();
             resetForm();
         }
 
@@ -4353,6 +4380,63 @@
         function hideDeleteModal() {
             deleteModalOverlay.classList.remove('active');
             recordToDelete = null;
+        }
+
+        // 显示编辑记录模态框
+        function showEditModal(recordId) {
+            // 找到要编辑的记录
+            const record = records.find(r => r.id === recordId);
+            if (!record) {
+                showToast('记录不存在');
+                return;
+            }
+
+            // 设置正在编辑的记录ID
+            document.getElementById('editingRecordId').value = recordId;
+
+            // 修改模态框标题和按钮文字
+            document.getElementById('modalTitle').textContent = '编辑记录';
+            document.getElementById('saveBtn').textContent = '保存修改';
+
+            // 预填充表单数据
+            // 设置类型
+            selectedType = record.type;
+            typeBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.type === record.type) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // 渲染分类选择器
+            renderCategorySelector();
+
+            // 设置分类
+            if (record.categoryId) {
+                setTimeout(() => {
+                    const categoryBtn = document.querySelector(`.category-btn[data-category-id="${record.categoryId}"]`);
+                    if (categoryBtn) {
+                        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                        categoryBtn.classList.add('active');
+                        const category = categories[record.type].find(c => c.id === record.categoryId);
+                        if (category) {
+                            selectedCategory = category;
+                        }
+                    }
+                }, 0);
+            }
+
+            // 设置金额
+            amountInput.value = record.amount;
+
+            // 设置备注
+            noteInput.value = record.note || '';
+
+            // 设置日期
+            dateInput.value = record.date;
+
+            // 显示模态框
+            modalOverlay.classList.add('active');
         }
 
         // 删除记录
@@ -4413,40 +4497,97 @@
             const note = noteInput.value || (selectedType === 'expense' ? '支出' : '收入');
             const date = dateInput.value;
 
-            // 创建记录对象
-            const record = {
-                id: Date.now(),
-                type: selectedType,
-                amount: amount,
-                note: note,
-                date: date,
-                categoryId: selectedCategory ? selectedCategory.id : null
-            };
+            // 检查是否在编辑模式
+            const editingRecordId = document.getElementById('editingRecordId').value;
 
-            // 添加到记录数组
-            records.unshift(record);
-            
-            // 保存到 localStorage
-            saveRecordsToStorage();
+            if (editingRecordId) {
+                // 编辑模式：更新现有记录
+                const recordIndex = records.findIndex(r => r.id === parseInt(editingRecordId));
+                if (recordIndex !== -1) {
+                    records[recordIndex] = {
+                        id: parseInt(editingRecordId),
+                        type: selectedType,
+                        amount: amount,
+                        note: note,
+                        date: date,
+                        categoryId: selectedCategory ? selectedCategory.id : null
+                    };
+                    
+                    // 保存到 localStorage
+                    saveRecordsToStorage();
 
-            // 重新渲染记录列表
-            renderRecords();
+                    // 重新渲染记录列表
+                    renderRecords();
 
-            // 更新统计数据
-            updateStats();
+                    // 更新统计数据
+                    updateStats();
 
-            // 更新图表
-            updateCharts();
+                    // 更新图表
+                    updateCharts();
 
-            // 更新预算显示
-            updateBudgets();
+                    // 更新预算显示
+                    updateBudgets();
 
-            // 显示成功提示
-            showToast();
+                    // 显示成功提示
+                    showToast('记录修改成功');
 
-            // 隐藏模态框
-            hideModal();
+                    // 隐藏模态框并重置表单
+                    hideModal();
+                    resetFormToAddMode();
+                }
+            } else {
+                // 新增模式：创建新记录
+                const record = {
+                    id: Date.now(),
+                    type: selectedType,
+                    amount: amount,
+                    note: note,
+                    date: date,
+                    categoryId: selectedCategory ? selectedCategory.id : null
+                };
+
+                // 添加到记录数组
+                records.unshift(record);
+                
+                // 保存到 localStorage
+                saveRecordsToStorage();
+
+                // 重新渲染记录列表
+                renderRecords();
+
+                // 更新统计数据
+                updateStats();
+
+                // 更新图表
+                updateCharts();
+
+                // 更新预算显示
+                updateBudgets();
+
+                // 显示成功提示
+                showToast();
+
+                // 隐藏模态框
+                hideModal();
+            }
         });
+
+        // 重置表单为新增模式
+        function resetFormToAddMode() {
+            document.getElementById('editingRecordId').value = '';
+            document.getElementById('modalTitle').textContent = '记一笔';
+            document.getElementById('saveBtn').textContent = '保存';
+            amountInput.value = '';
+            noteInput.value = '';
+            selectedType = 'expense';
+            typeBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.type === 'expense') {
+                    btn.classList.add('active');
+                }
+            });
+            renderCategorySelector();
+        }
 
         // 渲染记录列表
         function renderRecords() {
@@ -4504,7 +4645,10 @@
                             <div class="record-amount ${record.type}">
                                 ${amountPrefix}¥${record.amount.toFixed(2)}
                             </div>
-                            <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="edit-btn" onclick="showEditModal(${record.id})">编辑</button>
+                                <button class="delete-btn" onclick="showDeleteModal(${record.id})">删除</button>
+                            </div>
                         </div>
                     </div>
                 `;
