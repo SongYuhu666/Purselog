@@ -2000,6 +2000,16 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
+        /* ============================================
+           桌面端专用样式 (屏幕宽度 > 768px)
+           ============================================ */
+        @media (min-width: 769px) {
+            /* 桌面端隐藏多余的预算进度条 */
+            .budget-progress-wrapper {
+                display: none !important;
+            }
+        }
+
         /* 预算总览项 - 带圆角背景条 */
         .budget-overview-bar {
             background: #f1f5f9;
