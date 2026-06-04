@@ -39,13 +39,14 @@
             background: var(--light-bg);
             color: var(--text-primary);
             min-height: 100vh;
+            line-height: 1.6;
         }
 
         /* 容器 */
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px 16px;
         }
 
         /* 头部 */
@@ -90,15 +91,22 @@
         }
 
         .tab-btn {
-            padding: 10px 24px;
+            flex: 1;
+            min-height: 44px;
+            padding: 10px 12px;
             border: 2px solid var(--border-color);
             background: var(--white);
             border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-secondary);
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
         }
 
         .tab-btn:hover {
@@ -299,6 +307,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .section-title {
@@ -306,18 +316,45 @@
             font-weight: 600;
             color: var(--text-primary);
             margin: 0;
+            flex-shrink: 0;
+        }
+
+        .section-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .export-btn,
+        .clear-all-btn {
+            min-height: 40px;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border: none;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
         }
 
         .clear-all-btn {
             background: var(--light-bg);
             color: var(--text-secondary);
-            border: none;
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
         }
 
         .clear-all-btn:hover {
@@ -350,6 +387,7 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             transition: all 0.2s ease;
+            min-height: 72px;
         }
 
         .record-item:hover {
@@ -360,17 +398,20 @@
         .record-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
         }
 
         .record-type {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            flex-shrink: 0;
         }
 
         .record-type.expense {
@@ -385,21 +426,35 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            min-width: 0;
         }
 
         .record-note {
             font-weight: 500;
             color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .record-date {
             font-size: 0.85rem;
             color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .record-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
         }
 
         .record-amount {
             font-size: 1.25rem;
             font-weight: 700;
+            text-align: right;
+            flex-shrink: 0;
         }
 
         .record-amount.expense {
@@ -410,22 +465,21 @@
             color: #22c55e;
         }
 
-        .record-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         .delete-btn {
             background: #fee2e2;
             color: #ef4444;
             border: none;
-            padding: 8px 12px;
+            padding: 8px 14px;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
             transition: all 0.2s ease;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         .delete-btn:hover {
@@ -896,25 +950,6 @@
             .filter-actions {
                 flex-direction: column;
             }
-        }
-
-        /* 导出按钮 */
-        .export-btn {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-        }
-
-        .export-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
         }
 
         /* 导出格式选择器 */
@@ -1796,7 +1831,7 @@
                     <section class="records-section">
                         <div class="section-header">
                             <h2 class="section-title">最近记录</h2>
-                            <div style="display: flex; gap: 12px;">
+                            <div class="section-header-actions">
                                 <button class="export-btn" id="exportBtn">
                                     📤 导出数据
                                 </button>
