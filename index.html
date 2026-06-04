@@ -154,12 +154,15 @@
         /* 时间周期切换器 */
         .period-selector {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
             margin-bottom: 20px;
             justify-content: center;
         }
 
         .period-btn {
+            flex: 0 0 auto;
+            min-width: 70px;
             padding: 8px 16px;
             border: 2px solid var(--border-color);
             background: var(--white);
@@ -169,6 +172,7 @@
             font-weight: 500;
             color: var(--text-secondary);
             transition: all 0.2s ease;
+            text-align: center;
         }
 
         .period-btn:hover {
@@ -180,6 +184,68 @@
             background: var(--primary-color);
             border-color: var(--primary-color);
             color: var(--white);
+        }
+
+        /* 自定义日期选择器 */
+        .custom-date-range {
+            background: var(--light-bg);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-top: 12px;
+        }
+
+        .custom-date-inputs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .custom-date-group {
+            flex: 1;
+            max-width: 160px;
+        }
+
+        .custom-date-label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-align: center;
+        }
+
+        .custom-date-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .custom-date-separator {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-top: 20px;
+        }
+
+        .custom-date-apply-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .custom-date-apply-btn:hover {
+            background: var(--primary-dark);
         }
 
         /* 统计卡片网格 */
@@ -1421,30 +1487,60 @@
             }
 
             /* 总进度条 */
-            .budget-progress-bar {
-                height: 8px;
-                background: var(--light-bg);
-                border-radius: 4px;
-                overflow: hidden;
-            }
+        .budget-progress-bar {
+            height: 24px;
+            background: var(--light-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
 
-            .budget-progress-fill {
-                height: 100%;
-                border-radius: 4px;
-                transition: width 0.3s ease;
-            }
+        .budget-progress-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-            .budget-progress-fill.normal {
-                background: #3b82f6;
-            }
+        .budget-progress-fill.normal {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        }
 
-            .budget-progress-fill.warning {
-                background: #f59e0b;
-            }
+        .budget-progress-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
 
-            .budget-progress-fill.over {
-                background: #ef4444;
-            }
+        .budget-progress-fill.over {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+
+        .budget-progress-text {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .budget-progress-wrapper {
+            margin-top: 16px;
+        }
+
+        /* 预算空状态 */
+        .budget-empty {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-secondary);
+        }
+
+        .budget-empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
 
             /* 分类预算列表 */
             .budget-category-list {
@@ -1745,9 +1841,29 @@
                     <section class="stats-section">
                         <!-- 时间周期切换器 -->
                         <div class="period-selector">
+                            <button class="period-btn" data-period="today">今日</button>
+                            <button class="period-btn" data-period="last7Days">近7天</button>
+                            <button class="period-btn" data-period="last30Days">近30天</button>
                             <button class="period-btn" data-period="lastMonth">上月</button>
                             <button class="period-btn active" data-period="currentMonth">本月</button>
                             <button class="period-btn" data-period="currentYear">本年</button>
+                            <button class="period-btn" data-period="custom">自定义</button>
+                        </div>
+
+                        <!-- 自定义日期选择器 -->
+                        <div class="custom-date-range" id="customDateRange" style="display: none; margin-top: 12px;">
+                            <div class="custom-date-inputs">
+                                <div class="custom-date-group">
+                                    <label class="custom-date-label">开始日期</label>
+                                    <input type="date" class="custom-date-input" id="customStartDate">
+                                </div>
+                                <div class="custom-date-separator">至</div>
+                                <div class="custom-date-group">
+                                    <label class="custom-date-label">结束日期</label>
+                                    <input type="date" class="custom-date-input" id="customEndDate">
+                                </div>
+                            </div>
+                            <button class="custom-date-apply-btn" id="applyCustomDate">应用</button>
                         </div>
 
                         <!-- 统计卡片网格 -->
@@ -1769,9 +1885,9 @@
 
                     <!-- 图表区域 -->
                     <div class="chart-section">
-                        <!-- 饼图：本月支出分类占比 -->
+                        <!-- 支出分类占比饼图 -->
                         <div class="chart-card">
-                            <h3 class="chart-title">💰 本月支出分类占比</h3>
+                            <h3 class="chart-title">💰 支出分类占比</h3>
                             <div class="chart-container">
                                 <canvas id="expensePieChart"></canvas>
                             </div>
@@ -1780,9 +1896,9 @@
                             </div>
                         </div>
 
-                        <!-- 折线图：近7天收支趋势 -->
+                        <!-- 收支趋势折线图 -->
                         <div class="chart-card">
-                            <h3 class="chart-title">📈 近7天收支趋势</h3>
+                            <h3 class="chart-title">📈 收支趋势</h3>
                             <div class="chart-container">
                                 <canvas id="trendLineChart"></canvas>
                             </div>
@@ -1799,11 +1915,14 @@
                             <div class="budget-card-header">
                                 <h3 class="budget-card-title">💼 本月预算</h3>
                                 <button class="budget-set-btn" id="budgetSetBtn">
-                                    <span>⚙️</span>
-                                    设置预算
+                                    ⚙️ 设置预算
                                 </button>
                             </div>
-                            <div class="budget-overview">
+                            <div class="budget-empty" id="budgetEmpty">
+                                <div class="budget-empty-icon">📋</div>
+                                <div>还没有设置预算，点击右上角按钮开始管理</div>
+                            </div>
+                            <div class="budget-overview" id="budgetOverview" style="display: none;">
                                 <div class="budget-overview-item">
                                     <div class="budget-overview-label">总预算</div>
                                     <div class="budget-overview-value total" id="budgetTotal">¥0.00</div>
@@ -1817,8 +1936,12 @@
                                     <div class="budget-overview-value remaining" id="budgetRemaining">¥0.00</div>
                                 </div>
                             </div>
-                            <div class="budget-progress-bar">
-                                <div class="budget-progress-fill normal" id="budgetProgressFill" style="width: 0%;"></div>
+                            <div class="budget-progress-wrapper" id="budgetProgressWrapper" style="display: none;">
+                                <div class="budget-progress-bar">
+                                    <div class="budget-progress-fill normal" id="budgetProgressFill" style="width: 0%;">
+                                        <span class="budget-progress-text" id="budgetProgressText">0%</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1830,7 +1953,7 @@
                             <div class="budget-category-list" id="budgetCategoryList">
                                 <div class="budget-empty">
                                     <div class="budget-empty-icon">📋</div>
-                                    <div>点击上方"设置预算"开始管理预算</div>
+                                    <div>还没有设置分类预算</div>
                                 </div>
                             </div>
                         </div>
@@ -3609,6 +3732,25 @@
             let startDate, endDate;
 
             switch (period) {
+                case 'today':
+                    // 今日
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
+                case 'last7Days':
+                    // 近7天
+                    startDate = new Date(now);
+                    startDate.setDate(now.getDate() - 6);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
+                case 'last30Days':
+                    // 近30天
+                    startDate = new Date(now);
+                    startDate.setDate(now.getDate() - 29);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+                    break;
                 case 'lastMonth':
                     // 上月
                     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -3625,6 +3767,16 @@
                     startDate = new Date(now.getFullYear(), 0, 1);
                     endDate = new Date(now.getFullYear(), 11, 31);
                     break;
+                case 'custom':
+                    // 自定义范围，使用全局变量
+                    return {
+                        start: customDateStart,
+                        end: customDateEnd
+                    };
+                default:
+                    // 默认本月
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
             }
 
             return {
@@ -3678,8 +3830,8 @@
 
         // 更新支出饼图
         function updateExpensePieChart() {
-            // 获取本月的支出记录
-            const { start, end } = getPeriodRange('currentMonth');
+            // 使用当前选择的时间范围
+            const { start, end } = getPeriodRange(currentPeriod);
             const expenseRecords = records.filter(record => {
                 return record.type === 'expense' && record.date >= start && record.date <= end;
             });
@@ -3763,37 +3915,85 @@
 
         // 更新趋势折线图
         function updateTrendLineChart() {
-            // 获取近7天的数据
-            const today = new Date();
-            const sevenDaysAgo = new Date(today);
-            sevenDaysAgo.setDate(today.getDate() - 6);
+            // 使用当前选择的时间范围
+            const { start, end } = getPeriodRange(currentPeriod);
+            const startDate = new Date(start);
+            const endDate = new Date(end);
 
-            // 生成近7天的日期标签
+            // 生成日期标签和数据
             const labels = [];
             const incomeData = [];
             const expenseData = [];
 
-            for (let i = 0; i < 7; i++) {
-                const date = new Date(sevenDaysAgo);
-                date.setDate(sevenDaysAgo.getDate() + i);
-                const dateStr = date.toISOString().split('T')[0];
-                labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+            // 根据时间跨度确定分组方式
+            const dayDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
 
-                // 计算当天收入和支出
-                const dayRecords = records.filter(r => r.date === dateStr);
-                let dayIncome = 0;
-                let dayExpense = 0;
+            if (dayDiff === 0) {
+                // 今日：按小时分组
+                for (let hour = 0; hour < 24; hour++) {
+                    labels.push(`${hour}:00`);
+                    const hourStr = hour.toString().padStart(2, '0');
+                    const dayStr = startDate.toISOString().split('T')[0];
+                    const hourRecords = records.filter(r => r.date === dayStr && r.date.endsWith(`T${hourStr}`));
+                    let hourIncome = 0;
+                    let hourExpense = 0;
+                    hourRecords.forEach(r => {
+                        if (r.type === 'income') {
+                            hourIncome += r.amount;
+                        } else {
+                            hourExpense += r.amount;
+                        }
+                    });
+                    incomeData.push(hourIncome);
+                    expenseData.push(hourExpense);
+                }
+            } else if (dayDiff <= 31) {
+                // 按天分组
+                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                    const dateStr = d.toISOString().split('T')[0];
+                    labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
 
-                dayRecords.forEach(r => {
-                    if (r.type === 'income') {
-                        dayIncome += r.amount;
-                    } else {
-                        dayExpense += r.amount;
-                    }
-                });
+                    // 计算当天收入和支出
+                    const dayRecords = records.filter(r => r.date === dateStr);
+                    let dayIncome = 0;
+                    let dayExpense = 0;
 
-                incomeData.push(dayIncome);
-                expenseData.push(dayExpense);
+                    dayRecords.forEach(r => {
+                        if (r.type === 'income') {
+                            dayIncome += r.amount;
+                        } else {
+                            dayExpense += r.amount;
+                        }
+                    });
+
+                    incomeData.push(dayIncome);
+                    expenseData.push(dayExpense);
+                }
+            } else {
+                // 按月分组
+                let currentMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+                while (currentMonth <= endDate) {
+                    const monthStr = `${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`;
+                    labels.push(`${currentMonth.getMonth() + 1}月`);
+
+                    // 计算当月收入和支出
+                    const monthRecords = records.filter(r => r.date.startsWith(monthStr));
+                    let monthIncome = 0;
+                    let monthExpense = 0;
+
+                    monthRecords.forEach(r => {
+                        if (r.type === 'income') {
+                            monthIncome += r.amount;
+                        } else {
+                            monthExpense += r.amount;
+                        }
+                    });
+
+                    incomeData.push(monthIncome);
+                    expenseData.push(monthExpense);
+
+                    currentMonth.setMonth(currentMonth.getMonth() + 1);
+                }
             }
 
             // 如果所有数据都为0，显示空状态
@@ -3917,6 +4117,28 @@
         // 渲染总预算概览
         function renderBudgetOverview() {
             const totalBudget = budgets.total;
+
+            // 检查是否有设置总预算
+            const hasTotalBudget = totalBudget > 0;
+
+            // 显示/隐藏空状态和概览
+            const budgetEmpty = document.getElementById('budgetEmpty');
+            const budgetOverview = document.getElementById('budgetOverview');
+            const budgetProgressWrapper = document.getElementById('budgetProgressWrapper');
+
+            if (!hasTotalBudget) {
+                // 没有设置预算，显示空状态
+                if (budgetEmpty) budgetEmpty.style.display = 'block';
+                if (budgetOverview) budgetOverview.style.display = 'none';
+                if (budgetProgressWrapper) budgetProgressWrapper.style.display = 'none';
+                return;
+            }
+
+            // 有预算，显示概览
+            if (budgetEmpty) budgetEmpty.style.display = 'none';
+            if (budgetOverview) budgetOverview.style.display = 'grid';
+            if (budgetProgressWrapper) budgetProgressWrapper.style.display = 'block';
+
             const usedAmount = getTotalMonthExpense();
             const remainingAmount = totalBudget - usedAmount;
             const percentage = totalBudget > 0 ? (usedAmount / totalBudget) * 100 : 0;
@@ -3930,6 +4152,7 @@
             // 设置剩余金额颜色
             if (remainingAmount >= 0) {
                 budgetRemaining.className = 'budget-overview-value remaining';
+                budgetRemaining.style.color = '#22c55e';
             } else {
                 budgetRemaining.className = 'budget-overview-value remaining';
                 budgetRemaining.style.color = '#ef4444';
@@ -3938,20 +4161,26 @@
             // 更新进度条
             budgetProgressFill.style.width = `${Math.min(percentage, 100)}%`;
             budgetProgressFill.className = `budget-progress-fill ${status}`;
+
+            // 更新进度条百分比文字
+            const budgetProgressText = document.getElementById('budgetProgressText');
+            if (budgetProgressText) {
+                budgetProgressText.textContent = `${Math.round(percentage)}%`;
+            }
         }
 
         // 渲染分类预算列表
         function renderCategoryBudgets() {
             const expenseCategories = categories.expense;
 
-            // 如果没有设置任何预算，显示空状态
-            const hasBudget = budgets.total > 0 || Object.keys(budgets.categories).some(key => budgets.categories[key] > 0);
+            // 检查是否有设置任何分类预算
+            const hasCategoryBudget = Object.keys(budgets.categories).some(key => budgets.categories[key] > 0);
 
-            if (!hasBudget || expenseCategories.length === 0) {
+            if (!hasCategoryBudget || expenseCategories.length === 0) {
                 budgetCategoryList.innerHTML = `
                     <div class="budget-empty">
                         <div class="budget-empty-icon">📋</div>
-                        <div>点击上方"设置预算"开始管理预算</div>
+                        <div>还没有设置分类预算</div>
                     </div>
                 `;
                 return;
@@ -4306,20 +4535,68 @@
         // 时间周期切换
         periodBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                const period = btn.dataset.period;
+
                 // 移除所有按钮的 active 类
                 periodBtns.forEach(b => b.classList.remove('active'));
                 // 添加当前按钮的 active 类
                 btn.classList.add('active');
                 // 更新当前周期
-                currentPeriod = btn.dataset.period;
-                // 更新统计数据
-                updateStats();
-                // 更新图表
-                updateCharts();
-                // 更新预算
-                updateBudgets();
+                currentPeriod = period;
+
+                // 处理自定义日期显示/隐藏
+                if (period === 'custom') {
+                    customDateRange.style.display = 'block';
+                    // 设置默认的日期范围（近30天）
+                    const today = new Date();
+                    const thirtyDaysAgo = new Date(today);
+                    thirtyDaysAgo.setDate(today.getDate() - 29);
+                    customStartDate.value = thirtyDaysAgo.toISOString().split('T')[0];
+                    customEndDate.value = today.toISOString().split('T')[0];
+                } else {
+                    customDateRange.style.display = 'none';
+                    // 更新统计数据
+                    updateStats();
+                    // 更新图表
+                    updateCharts();
+                    // 更新预算
+                    updateBudgets();
+                }
             });
         });
+
+        // 自定义日期变量
+        let customDateStart = '';
+        let customDateEnd = '';
+        const customDateRange = document.getElementById('customDateRange');
+        const customStartDate = document.getElementById('customStartDate');
+        const customEndDate = document.getElementById('customEndDate');
+        const applyCustomDateBtn = document.getElementById('applyCustomDate');
+
+        // 应用自定义日期
+        if (applyCustomDateBtn) {
+            applyCustomDateBtn.addEventListener('click', () => {
+                if (customStartDate.value && customEndDate.value) {
+                    customDateStart = customStartDate.value;
+                    customDateEnd = customEndDate.value;
+
+                    if (customDateStart > customDateEnd) {
+                        showToast('开始日期不能晚于结束日期');
+                        return;
+                    }
+
+                    // 更新统计数据
+                    updateStats();
+                    // 更新图表
+                    updateCharts();
+                    // 更新预算
+                    updateBudgets();
+                    showToast('日期范围已更新');
+                } else {
+                    showToast('请选择开始和结束日期');
+                }
+            });
+        }
 
         // 设置默认日期为今天
         function setDefaultDate() {
